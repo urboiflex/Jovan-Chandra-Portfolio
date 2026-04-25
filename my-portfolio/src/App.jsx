@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 
 import motivationImg from './assets/anjay.jpeg';
-import alphatonCert from './assets/Alphaton 3rd place certif.jpg';
+import alphatonCert from './assets/Alphaton.jpg';
 import apuCareerCert from './assets/MegaCareer.jpg';
 import sparkathonCert from './assets/sparkathon certificate.png';
 import goldlevel from './assets/GoldLevel.jpg';
-import SQLInter from './assets/SQLIntermediate.jpg';
+import SQLInter from './assets/SQLIntermediate.jpg';git
 import vouch from './assets/Vouch.png';
 import vouch1 from './assets/UMAI.png';
 import vouch2 from './assets/UMAnalytics.png';
