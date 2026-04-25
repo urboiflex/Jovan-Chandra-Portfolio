@@ -21,6 +21,13 @@ import KNCShop2 from './assets/KNCShop2.png';
 import KNCShop3 from './assets/KNCShop3.png';
 import KNCShop4 from './assets/KNCShop4.png';
 import KNCShop5 from './assets/KNCShop5.png';
+import ecobro from './assets/Dashboard Page.png';
+import ecobro1 from './assets/Login Page.png';
+import ecobro2 from './assets/News Page.png';
+import ecobro3 from './assets/Profile Page.png';
+import ecobro4 from './assets/Register Page.png';
+import ecobro5 from './assets/Reward Page.png';
+import ecobro6 from './assets/Tracker Page.png';
 
 // --- Global Project Data ---
 const PROJECTS_DATA = [
@@ -48,7 +55,20 @@ const PROJECTS_DATA = [
     duration: "3 weeks",
     roles: "Developer",
     summary: "Kicks & Co. is a fully functional e-commerce platform designed to emulate a real-life virtual sneaker store. Targeted at young adults and sneaker enthusiasts, the platform delivers an elegant, high-end shopping experience featuring sophisticated front-end animations, smooth scrolling, and parallax effects. The project successfully bridges the gap between customer-facing usability and advanced, dynamic data management.",
-    githubUrl: "#"
+    githubUrl: "https://github.com/urboiflex/Kicks-Co-E-Commerce-Website"
+  },
+  {
+    id: "03",
+    title: "EcoBro Mobile App",
+    category: "Design",
+    desc: "A clean, intuitive mobile application designed to help users track, reduce, and offset their daily carbon emissions through actionable habits and a gamified rewards system.",
+    img: ecobro,
+    gallery: [ecobro, ecobro1, ecobro2, ecobro3, ecobro4, ecobro5, ecobro6], // <-- Multi-image gallery added here!
+    tools: ["Figma"],
+    duration: "3 days",
+    roles: "Developer",
+    summary: "EcoBro empowers users to cultivate sustainable lifestyles by making environmental impact measurable and rewarding. The application combines daily habit tracking with an engaging points-based system, incentivizing eco-friendly choices like utilizing public transit, reducing plastic waste, and conserving energy. Designed with a fresh, modern aesthetic, the interface provides a seamless user experience that turns climate awareness into daily action. Through localized climate news, personalized carbon budgets, and tangible milestone rewards, EcoBro bridges the gap between environmental responsibility and user engagement, offering a comprehensive tool for conscious living.",
+    githubUrl: "https://github.com/urboiflex/EcoBro"
   }
 ];
 
@@ -82,21 +102,21 @@ const AWARDS_DATA = [
     year: "2025",
     title: "APU Alphaton 3rd Place", 
     issuer: "WorldQuant",
-    img: alphatonCert // Using the imported variable here!
+    img: alphatonCert 
   },
   {
     id: 2,
     year: "2025",
     title: "APU Mega Career Fair Staff",
     issuer: "Asia Pacific University",
-    img: apuCareerCert // Using the imported variable here!
+    img: apuCareerCert 
   },
   {
     id: 3,
     year: "2024",
     title: "Sparkathon Finalist",
     issuer: "APU x BAT",
-    img: sparkathonCert // Using the imported variable here!
+    img: sparkathonCert 
   },
   {
     id: 4,
@@ -652,6 +672,106 @@ const InteractiveTitle = ({ text, className = "" }) => {
   );
 };
 
+// --- LUXURIOUS COMING SOON OVERLAY ---
+const ComingSoonOverlay = ({ isOpen, onClose }) => {
+  const containerRef = useRef(null);
+  const curtainTopRef = useRef(null);
+  const curtainBottomRef = useRef(null);
+  const textContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (!window.gsap) return;
+    const tl = window.gsap.timeline();
+
+    if (isOpen) {
+      window.gsap.set(containerRef.current, { visibility: 'visible', pointerEvents: 'auto' });
+      
+      // Cinematic Split Curtain Entrance
+      tl.to([curtainTopRef.current, curtainBottomRef.current], {
+          height: "50vh",
+          duration: 1.2,
+          ease: "expo.inOut",
+          stagger: 0.1
+        })
+        .fromTo('.gallery-stagger', 
+          { y: 100, opacity: 0, rotateX: 15 },
+          { y: 0, opacity: 1, rotateX: 0, duration: 1.5, stagger: 0.1, ease: "power4.out" },
+          "-=0.6"
+        );
+    } else {
+      // Exit Animation
+      tl.to('.gallery-stagger', { y: -50, opacity: 0, duration: 0.6, stagger: 0.05, ease: "power3.in" })
+        .to([curtainBottomRef.current, curtainTopRef.current], { 
+          height: "0vh", 
+          duration: 1, 
+          ease: "expo.inOut",
+          stagger: 0.1
+        }, "-=0.2")
+        .set(containerRef.current, { visibility: 'hidden', pointerEvents: 'none' });
+    }
+  }, [isOpen]);
+
+  // Mouse Parallax Effect for the overlay text
+  useEffect(() => {
+    if (!isOpen || !window.gsap) return;
+    
+    const handleMouseMove = (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 80;
+      const y = (e.clientY / window.innerHeight - 0.5) * 80;
+      
+      window.gsap.to(textContainerRef.current, {
+        x: x,
+        y: y,
+        duration: 2,
+        ease: "power3.out"
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [isOpen]);
+
+  return (
+    <div ref={containerRef} className="fixed inset-0 z-[100] flex items-center justify-center invisible">
+      
+      {/* Split Curtains */}
+      <div ref={curtainTopRef} className="absolute top-0 left-0 w-full h-0 bg-[#050505] shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex flex-col justify-end overflow-hidden z-10">
+        <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+      </div>
+      <div ref={curtainBottomRef} className="absolute bottom-0 left-0 w-full h-0 bg-[#050505] shadow-[0_-10px_30px_rgba(0,0,0,0.5)] overflow-hidden z-10">
+         <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+      </div>
+      
+      {/* 3D Floating Text Container */}
+      <div ref={textContainerRef} className="relative z-20 flex flex-col items-center justify-center text-center px-4 w-full" style={{ perspective: '1000px' }}>
+        <div className="overflow-hidden mb-2 w-full">
+           <p className="gallery-stagger text-[#E8383D] font-light tracking-[0.4em] uppercase text-sm md:text-base w-full text-center">The Collection</p>
+        </div>
+        <div className="overflow-hidden pb-4 w-full flex justify-center">
+           <h2 className="gallery-stagger text-[12vw] md:text-[8vw] font-thin font-['Zen_Old_Mincho',_serif] uppercase tracking-tighter leading-none text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] w-full text-center">
+             Gallery
+           </h2>
+        </div>
+        <div className="w-[1px] h-16 bg-gradient-to-b from-[#E8383D] to-transparent gallery-stagger my-6"></div>
+        <div className="overflow-hidden w-full">
+           <h3 className="gallery-stagger text-2xl md:text-3xl font-extralight tracking-[0.3em] text-white/80 uppercase mb-6 w-full text-center">Coming Soon</h3>
+        </div>
+        <div className="overflow-hidden w-full flex justify-center">
+           <p className="gallery-stagger font-extralight tracking-wide text-sm md:text-base text-white/50 max-w-md text-center leading-relaxed">
+             Not much to see here yet - but trust me, I’m working on it.
+           </p>
+        </div>
+        <div className="overflow-hidden mt-16 w-full flex justify-center">
+          <button onClick={onClose} className="gallery-stagger group relative font-light tracking-widest text-sm uppercase project-link text-white/60 hover:text-white transition-colors duration-300 py-2">
+            Return to Portfolio
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-[1px] bg-[#E8383D] transition-all duration-500"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- Page Components ---
 
 const HomeView = ({ isLoaded }) => {
@@ -1093,7 +1213,7 @@ const WorksView = ({ isLoaded, onProjectClick }) => {
     if (!isLoaded || !window.gsap || !window.ScrollTrigger) return;
 
     const ctx = window.gsap.context(() => {
-      initFluidParallax(); // Apply the heavy floating lag!
+      initFluidParallax(); 
       
       // Header Animation
       window.gsap.fromTo('.works-header-anim', 
@@ -1226,7 +1346,7 @@ const ProjectDetailView = ({ project, nextProject, onBack, onNext, isLoaded }) =
     if (!isLoaded || !window.gsap) return;
 
     const ctx = window.gsap.context(() => {
-      initFluidParallax(); // Apply the heavy floating lag!
+      initFluidParallax(); 
       
       window.gsap.fromTo('.proj-detail-anim', 
         { y: 40, opacity: 0 }, 
@@ -1368,6 +1488,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'works' | 'project'
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const lenisRef = useRef(null);
 
   useEffect(() => {
@@ -1469,6 +1590,7 @@ export default function App() {
     <div ref={mainRef} className="min-h-screen w-full relative overflow-x-clip cursor-none selection:bg-[#E8383D] selection:text-white bg-[#111111] text-[#e0e0e0] font-['Montserrat',_sans-serif]">
       <CustomCursor />
       <TraceTrailBackground />
+      <ComingSoonOverlay isOpen={isGalleryOpen} onClose={() => setIsGalleryOpen(false)} />
 
       {/* --- Fullscreen Page Transition Curtain --- */}
       <div ref={inkCurtainRef} className="fixed inset-0 bg-[#070707] z-[75] scale-y-0 origin-top pointer-events-none"></div>
@@ -1509,7 +1631,7 @@ export default function App() {
             <span className={`transition-opacity font-light ${currentView === 'works' ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>Works</span>
             <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 ${currentView === 'works' ? 'w-full bg-[#E8383D]' : 'w-0 group-hover:w-full bg-white'}`}></span>
           </button>
-          <button className="relative group w-max text-left opacity-50 hover:opacity-100 transition-opacity duration-500 project-link">
+          <button onClick={() => setIsGalleryOpen(true)} className="relative group w-max text-left opacity-50 hover:opacity-100 transition-opacity duration-500 project-link">
             <span className="font-light">Gallery</span>
             <span className="absolute -bottom-2 left-0 w-0 group-hover:w-full h-[1px] bg-white transition-all duration-500"></span>
           </button>
@@ -1541,7 +1663,7 @@ export default function App() {
             <span className={`transition-opacity font-light ${currentView === 'works' ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>Works</span>
             <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 ${currentView === 'works' ? 'w-full bg-[#E8383D]' : 'w-0 group-hover:w-full bg-white'}`}></span>
           </button>
-          <button className="relative group w-max text-left opacity-50 hover:opacity-100 transition-opacity duration-500 project-link">
+          <button onClick={() => setIsGalleryOpen(true)} className="relative group w-max text-left opacity-50 hover:opacity-100 transition-opacity duration-500 project-link">
             <span className="font-light">Gallery</span>
             <span className="absolute -bottom-2 left-0 w-0 group-hover:w-full h-[1px] bg-white transition-all duration-500"></span>
           </button>
