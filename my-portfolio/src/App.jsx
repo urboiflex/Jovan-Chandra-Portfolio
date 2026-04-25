@@ -5,7 +5,7 @@ import alphatonCert from './assets/Alphaton.jpg';
 import apuCareerCert from './assets/MegaCareer.jpg';
 import sparkathonCert from './assets/sparkathon certificate.png';
 import goldlevel from './assets/GoldLevel.jpg';
-import SQLInter from './assets/SQLIntermediate.jpg';git
+import SQLInter from './assets/SQLIntermediate.jpg';
 import vouch from './assets/Vouch.png';
 import vouch1 from './assets/UMAI.png';
 import vouch2 from './assets/UMAnalytics.png';
