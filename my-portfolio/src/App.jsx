@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 
 import motivationImg from './assets/anjay.jpeg';
 import alphatonCert from './assets/Alphaton 3rd place certif.jpg';
-import apuCareerCert from './assets/APU mega career certif.jpg';
+import apuCareerCert from './assets/MegaCareer.jpg';
 import sparkathonCert from './assets/sparkathon certificate.png';
 import goldlevel from './assets/GoldLevel.jpg';
 import SQLInter from './assets/SQLIntermediate.jpg';
