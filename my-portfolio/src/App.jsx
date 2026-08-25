@@ -1,6 +1,36 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { motion } from 'framer-motion';
 
-import motivationImg from './assets/anjay.jpeg';
+import EditorialHero from './EditorialHero.jsx';
+import ProfileStorySection from './ProfileStorySection.jsx';
+import FeaturedProjectsSection from './FeaturedProjectsSection.jsx';
+import ProjectShowcaseModal from './ProjectShowcaseModal.jsx';
+import SkillsAccordion from './SkillsAccordion.jsx';
+import SignatureMarqueeSection from './SignatureMarqueeSection.jsx';
+import CinematicContactSection from './CinematicContactSection.jsx';
+import ScrollProgressRail from './ScrollProgressRail.jsx';
+import SplitHoverText from './SplitHoverText.jsx';
+import InfoView from './InfoView.jsx';
+import ContactView from './ContactView.jsx';
+import WorksArchiveView from './WorksArchiveView.jsx';
+import ProjectCaseStudyView from './ProjectCaseStudyView.jsx';
+import {
+  createAnimationFrameLoop,
+  getSmoothScrollOptions,
+  loadScriptOnce,
+  resumeSmoothScroll,
+} from './smoothScroll.js';
+import {
+  createInfoTransitionPlan,
+  getDetailArrivalReleaseTime,
+  getDetailNavigationMode,
+  getFlyingLabelHandoffTiming,
+  getInfoTransitionSwapDelayMs,
+  getPortfolioViewFromPath,
+} from './infoTransition.js';
+import { getProjectIdFromPath, getProjectPath } from './worksArchive.js';
+import { restoreCaseStudyScroll } from './caseStudyMotion.js';
+
 import alphatonCert from './assets/Alphaton.jpg';
 import apuCareerCert from './assets/MegaCareer.jpg';
 import sparkathonCert from './assets/sparkathon certificate.png';
@@ -16,18 +46,13 @@ import KNCHome2 from './assets/KNCHome2.png';
 import KNCHome3 from './assets/KNCHome3.png';
 import KNCLogin from './assets/KNCLogin.png';
 import KNCPayment from './assets/KNCPayment.png';
+import featuredBgVouch from './assets/featured-bg-vouch.jpg';
+import featuredBgKicks from './assets/featured-bg-kicks.jpg';
 import KNCShop from './assets/KNCShop.png';
 import KNCShop2 from './assets/KNCShop2.png';
 import KNCShop3 from './assets/KNCShop3.png';
 import KNCShop4 from './assets/KNCShop4.png';
 import KNCShop5 from './assets/KNCShop5.png';
-import ecobro from './assets/Dashboard Page.png';
-import ecobro1 from './assets/Login Page.png';
-import ecobro2 from './assets/News Page.png';
-import ecobro3 from './assets/Profile Page.png';
-import ecobro4 from './assets/Register Page.png';
-import ecobro5 from './assets/Reward Page.png';
-import ecobro6 from './assets/Tracker Page.png';
 
 // --- Global Project Data ---
 const PROJECTS_DATA = [
@@ -37,7 +62,8 @@ const PROJECTS_DATA = [
     category: "Hackathon Project / Full Stack",
     desc: "User Friendly dashboard that displays revenue streams for Grab Merchants. Also it has personal AI Assistant where it helps to generate analytics.",
     img: vouch,
-    gallery: [vouch, vouch1, vouch2, vouch3, vouch4], // <-- Multi-image gallery added here!
+    bgImg: featuredBgVouch,
+    gallery: [vouch, vouch1, vouch2, vouch3, vouch4],
     tools: ["HTML", "CSS", "Javascript", "R"],
     duration: "1 weeks",
     roles: "Front-end / Back-end",
@@ -50,118 +76,28 @@ const PROJECTS_DATA = [
     category: "Design / Frontend / Backend",
     desc: "Kicks & Co. is a luxury-inspired e-commerce marketplace dedicated exclusively to premium sneakers. Designed with an emphasis on high-end, award-winning aesthetics.",
     img: KNCHome,
-    gallery: [KNCLogin, KNCHome, KNCHome2, KNCHome3, KNCShop, KNCShop2, KNCShop3, KNCShop4, KNCShop5, KNCPayment], // <-- Multi-image gallery added here!
+    bgImg: featuredBgKicks,
+    gallery: [KNCLogin, KNCHome, KNCHome2, KNCHome3, KNCShop, KNCShop2, KNCShop3, KNCShop4, KNCShop5, KNCPayment],
     tools: ["HTML", "CSS", "Tailwind", "Javascript", "GSAP", "ASP.NET", "C#", "MySQL", "XML"],
     duration: "3 weeks",
     roles: "Developer",
     summary: "Kicks & Co. is a fully functional e-commerce platform designed to emulate a real-life virtual sneaker store. Targeted at young adults and sneaker enthusiasts, the platform delivers an elegant, high-end shopping experience featuring sophisticated front-end animations, smooth scrolling, and parallax effects. The project successfully bridges the gap between customer-facing usability and advanced, dynamic data management.",
     githubUrl: "https://github.com/urboiflex/Kicks-Co-E-Commerce-Website"
-  },
-  {
-    id: "03",
-    title: "EcoBro Mobile App",
-    category: "Design",
-    desc: "A clean, intuitive mobile application designed to help users track, reduce, and offset their daily carbon emissions through actionable habits and a gamified rewards system.",
-    img: ecobro,
-    gallery: [ecobro, ecobro1, ecobro2, ecobro3, ecobro4, ecobro5, ecobro6], // <-- Multi-image gallery added here!
-    tools: ["Figma"],
-    duration: "3 days",
-    roles: "Developer",
-    summary: "EcoBro empowers users to cultivate sustainable lifestyles by making environmental impact measurable and rewarding. The application combines daily habit tracking with an engaging points-based system, incentivizing eco-friendly choices like utilizing public transit, reducing plastic waste, and conserving energy. Designed with a fresh, modern aesthetic, the interface provides a seamless user experience that turns climate awareness into daily action. Through localized climate news, personalized carbon budgets, and tangible milestone rewards, EcoBro bridges the gap between environmental responsibility and user engagement, offering a comprehensive tool for conscious living.",
-    githubUrl: "https://github.com/urboiflex/EcoBro"
   }
 ];
 
-const EXPERIENCE_DATA = [
-  {
-    id: 1,
-    period: "Dec 2025 — Present",
-    company: "WorldQuant",
-    role: "Part-time Researcher",
-    desc: "Developed strong financial analysis and money management skills through hands-on research activities. Participated in financial workshops and events, gaining exposure to quantitative analysis and real-world market insights."
-  },
-  {
-    id: 2,
-    period: "July 2025 - Nov 2025",
-    company: "ASSA ABLOY Malaysia",
-    role: "Product Marketing & Opening Solutions Intern",
-    desc: "Integrating automation of data analytics processes, enhancing efficiency across teams. Utilized Python to clean and optimize company data, improving data integrity. Also participated in improving company data collection using LLama and Azure AI"
-  },
-  {
-    id: 3,
-    period: "Jan 2025 — Dec 2025",
-    company: "Asia Pacific University Indonesian Student Society (AUISS) | PPI APU",
-    role: "Resource & Information Staff",
-    desc: "Responsible for managing and coordinating bookings and logistics for student-related resources, including transport, venue reservations, and event equipment."
-  }
-];
+const GALLERY_CATEGORIES = ['All', 'UI / UX', 'Web Design'];
+
+// Gallery data — add your Vercel-hosted image URLs here when ready
+// Format: { id, title, category ('UI / UX' | 'Web Design'), url: 'https://...', wide: true/false }
+const GALLERY_DATA = [];
 
 const AWARDS_DATA = [
-  {
-    id: 1,
-    year: "2025",
-    title: "APU Alphaton 3rd Place", 
-    issuer: "WorldQuant",
-    img: alphatonCert 
-  },
-  {
-    id: 2,
-    year: "2025",
-    title: "APU Mega Career Fair Staff",
-    issuer: "Asia Pacific University",
-    img: apuCareerCert 
-  },
-  {
-    id: 3,
-    year: "2024",
-    title: "Sparkathon Finalist",
-    issuer: "APU x BAT",
-    img: sparkathonCert 
-  },
-  {
-    id: 4,
-    year: "2025",
-    title: "Gold Level Quant",
-    issuer: "WorldQuant",
-    img: goldlevel
-  },
-  {
-    id: 5,
-    year: "2025",
-    title: "SQl Intermediate Test",
-    issuer: "Hackerrank",
-    img: SQLInter
-  }
-];
-
-// --- Skill Data & Icon URLs ---
-const FRONTEND_SKILLS = [
-  { name: 'TypeScript', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968381.png' },
-  { name: 'React.js', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/3840px-React-icon.svg.png' },
-  { name: 'Next.js', url: 'https://img.icons8.com/color/1200/nextjs.jpg' },
-  { name: 'Tailwind CSS', url: 'https://www.svgrepo.com/show/374118/tailwind.svg' },
-  { name: 'HTML', url: 'https://cdn-icons-png.flaticon.com/512/919/919827.png' },
-  { name: 'CSS', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968242.png' } 
-];
-
-const BACKEND_SKILLS = [
-  { name: 'TypeScript', url: 'https://cdn-icons-png.flaticon.com/512/5968/5968381.png' },
-  { name: 'Node.js', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6bebC_d4eWwJ-x9ntqDuT94TvOgumSBVWHg&s' },
-  { name: 'Python', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1280px-Python-logo-notext.svg.png' },
-  { name: 'Java', url: 'https://cdn-icons-png.flaticon.com/512/226/226777.png' },
-  { name: 'C#', url: 'https://upload.wikimedia.org/wikipedia/commons/4/4f/Csharp_Logo.png' }, 
-  { name: 'XML', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3NoooAK_XO7hNS7Gw8_0ZxhUerKGgkcs_pg&s' }, 
-  { name: 'SQL', url: 'https://img.icons8.com/fluent/1200/sql.jpg' }
-];
-
-const TOOL_SKILLS = [
-  { name: 'Microsoft 365', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Microsoft_365_%282022%29.svg/500px-Microsoft_365_%282022%29.svg.png' }, 
-  { name: 'VSCode', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/500px-Visual_Studio_Code_1.35_icon.svg.png' }, 
-  { name: 'SAP', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHd0EmiAFrtoL_VQfssOOGKUCb7KovafdMSw&s' },
-  { name: 'Github', url: 'https://cdn.simpleicons.org/github/white' },
-  { name: 'Figma', url: 'https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg' },
-  { name: 'Power BI', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/New_Power_BI_Logo.svg/960px-New_Power_BI_Logo.svg.png' }, 
-  { name: 'Canva', url: 'https://static.vecteezy.com/system/resources/thumbnails/048/759/334/small/canva-transparent-icon-free-png.png' } 
+  { id: 1, year: "2025", title: "APU Alphaton 3rd Place", issuer: "WorldQuant", img: alphatonCert },
+  { id: 2, year: "2025", title: "APU Mega Career Fair Staff", issuer: "Asia Pacific University", img: apuCareerCert },
+  { id: 3, year: "2024", title: "Sparkathon Finalist", issuer: "APU x BAT", img: sparkathonCert },
+  { id: 4, year: "2025", title: "Gold Level Quant", issuer: "WorldQuant", img: goldlevel },
+  { id: 5, year: "2025", title: "SQl Intermediate Test", issuer: "Hackerrank", img: SQLInter }
 ];
 
 // --- Custom SVG Icons ---
@@ -181,153 +117,20 @@ const MailIcon = ({ size = 20, strokeWidth = 1.5 }) => (
 // --- Global GSAP Utility ---
 const initFluidParallax = () => {
   if (!window.gsap) return;
-  window.gsap.utils.toArray('[data-speed]').forEach(el => {
+  // Apply only if the element does not exist in horizontal mobile containers
+  window.gsap.utils.toArray('[data-speed]:not(.mobile-no-parallax)').forEach(el => {
     const speed = parseFloat(el.getAttribute('data-speed'));
     window.gsap.to(el, {
-      y: -120 * speed, // Dynamic upward lift
+      y: -120 * speed, 
       ease: "none",
       scrollTrigger: {
         trigger: el.parentElement,
         start: "top bottom",
         end: "bottom top",
-        scrub: 2 // This creates the heavy, buttery "lag"
+        scrub: 2 
       }
     });
   });
-};
-
-// --- Luxury Interactive Cursor Component ---
-const CustomCursor = () => {
-  const [hoverType, setHoverType] = useState(null); 
-  const [cursorImg, setCursorImg] = useState(null);
-
-  // High-Performance Refs to bypass React State stutters
-  const targetRef = useRef({ x: -100, y: -100 });
-  const dotRef = useRef({ x: -100, y: -100 });
-  const ringRef = useRef({ x: -100, y: -100 });
-  
-  const dotEl = useRef(null);
-  const ringEl = useRef(null);
-
-  useEffect(() => {
-    let animationFrameId;
-    const updatePosition = (e) => {
-      targetRef.current.x = e.clientX;
-      targetRef.current.y = e.clientY;
-      
-      const target = e.target;
-      const imgTarget = target.closest('[data-cursor-img]');
-      
-      if (target.closest('.view-project-cursor')) {
-        setHoverType('project');
-        setCursorImg(null);
-      } else if (imgTarget) {
-        setHoverType(imgTarget.dataset.cursorType || 'skill');
-        setCursorImg(imgTarget.dataset.cursorImg);
-      } else if (target.closest('a, button, .project-link, .project-clickable, input, textarea')) {
-        setHoverType('link');
-        setCursorImg(null);
-      } else {
-        setHoverType(null);
-        setCursorImg(null);
-      }
-    };
-
-    window.addEventListener('mousemove', updatePosition);
-
-    const ticker = () => {
-      // "Heavy" Professional Lerp Physics
-      dotRef.current.x += (targetRef.current.x - dotRef.current.x) * 0.15; // Dot trails smoothly
-      dotRef.current.y += (targetRef.current.y - dotRef.current.y) * 0.15;
-      
-      ringRef.current.x += (targetRef.current.x - ringRef.current.x) * 0.05; // Ring drags heavily
-      ringRef.current.y += (targetRef.current.y - ringRef.current.y) * 0.05;
-
-      if (dotEl.current) {
-        dotEl.current.style.transform = `translate3d(${dotRef.current.x}px, ${dotRef.current.y}px, 0)`;
-      }
-      if (ringEl.current) {
-        ringEl.current.style.transform = `translate3d(${ringRef.current.x}px, ${ringRef.current.y}px, 0)`;
-      }
-
-      animationFrameId = requestAnimationFrame(ticker);
-    };
-    
-    ticker();
-
-    return () => {
-      window.removeEventListener('mousemove', updatePosition);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  const isProject = hoverType === 'project';
-  const isLink = hoverType === 'link';
-  const isSkill = hoverType === 'skill';
-  const isEdu = hoverType === 'education';
-  const hasCustomImg = isSkill || isEdu;
-
-  return (
-    <>
-      {/* Core Cursor Dot (Fast) */}
-      <div 
-        ref={dotEl}
-        className="fixed top-0 left-0 pointer-events-none z-[110] will-change-transform"
-      >
-        <div className={`flex items-center justify-center transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] -translate-x-1/2 -translate-y-1/2
-          ${isProject ? 'w-24 h-24 rounded-[50%] bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] text-white font-medium text-xs tracking-widest' : 
-            isSkill ? 'w-16 h-16 rounded-[50%] bg-[#111111]/95 backdrop-blur-xl border border-[#E8383D]/40 p-4 shadow-[0_0_20px_rgba(232,56,61,0.3)]' :
-            isEdu ? 'w-[20rem] h-[12rem] md:w-[28rem] md:h-[16rem] rounded-xl bg-[#0a0a0a] overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)]' :
-            isLink ? 'w-0 h-0 rounded-[50%] opacity-0' : 'w-2 h-2 rounded-[50%] bg-[#E8383D]'}`}
-        >
-          {isProject && <span className="relative z-10 opacity-100 animate-[fadeInUp_0.3s_ease-out]">VIEW</span>}
-          {/* Using a key forces React to re-trigger the CSS fade animation when the image changes */}
-          {isSkill && cursorImg && <img key={cursorImg} src={cursorImg} alt="Skill Icon" className="w-full h-full object-contain opacity-0 animate-custom-fade" />}
-          {isEdu && cursorImg && <img key={cursorImg} src={cursorImg} alt="Education Preview" className="w-full h-full object-cover opacity-0 animate-custom-fade" />}
-        </div>
-      </div>
-      
-      {/* Trailing Cursor Ring (Heavy Lag) */}
-      <div 
-        ref={ringEl}
-        className="fixed top-0 left-0 pointer-events-none z-[105] will-change-transform"
-      >
-        <div className={`flex items-center justify-center rounded-[50%] transition-all duration-500 ease-out -translate-x-1/2 -translate-y-1/2
-          ${(isProject || hasCustomImg) ? 'w-0 h-0 opacity-0' : 
-            isLink ? 'w-16 h-16 bg-white/20 opacity-100' : 'w-8 h-8 border border-white/20 opacity-50'}`}
-        />
-      </div>
-    </>
-  );
-};
-
-// --- Live Clock Component ---
-const LiveClock = () => {
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const format = (options) => time.toLocaleTimeString('en-US', { timeZone: 'Asia/Kuala_Lumpur', ...options });
-  const hours = format({ hour12: false, hour: '2-digit' });
-  const minutes = format({ minute: '2-digit' });
-  const seconds = format({ second: '2-digit' });
-
-  return (
-    <div className="flex items-end gap-3 font-['Montserrat',_sans-serif] mt-1">
-      <div className="flex items-baseline text-4xl md:text-5xl font-thin tracking-tighter text-white">
-        <span>{hours}</span>
-        <span className="animate-[pulse_2s_ease-in-out_infinite] opacity-30 mx-1 -translate-y-1">:</span>
-        <span>{minutes}</span>
-      </div>
-      <div className="flex flex-col pb-1">
-        <span className="text-[#E8383D] text-sm font-medium tracking-widest w-6">{seconds}</span>
-        <span className="text-[10px] tracking-widest opacity-40 uppercase">MYT</span>
-      </div>
-    </div>
-  );
 };
 
 // --- Fully Interactive Physics Canvas Background ---
@@ -347,7 +150,9 @@ const TraceTrailBackground = () => {
 
     const initAmbientParticles = (w, h) => {
       ambientParticles = [];
-      for(let i = 0; i < 60; i++) {
+      // Reduce particle count on smaller screens for performance
+      const pCount = window.innerWidth < 768 ? 20 : 60;
+      for(let i = 0; i < pCount; i++) {
         ambientParticles.push(new AmbientParticle(w, h));
       }
     };
@@ -375,7 +180,7 @@ const TraceTrailBackground = () => {
       for(let i = 0; i < steps; i++) {
         const lerpX = lastMouse.x + dx * (i / steps);
         const lerpY = lastMouse.y + dy * (i / steps);
-        const color = isHovering ? '232, 56, 61' : '255, 255, 255';
+        const color = isHovering ? '11, 11, 11' : '94, 94, 90';
         particles.push(new TraceParticle(lerpX, lerpY, color));
       }
 
@@ -396,14 +201,14 @@ const TraceTrailBackground = () => {
           this.size = Math.random() * 1.5 + 0.8;
           this.baseAlpha = Math.random() * 0.4 + 0.1;
           this.pulseSpeed = Math.random() * 0.02 + 0.01;
-          this.color = '255, 223, 100'; 
+          this.color = '11, 11, 11';
         } else {
           this.baseVx = Math.random() * 0.5 + 0.1; 
           this.baseVy = Math.random() * 0.8 + 0.2; 
           this.size = Math.random() * 2.5 + 1.5;
           this.baseAlpha = Math.random() * 0.2 + 0.05;
           this.spin = (Math.random() - 0.5) * 0.03;
-          this.color = Math.random() > 0.5 ? '255, 228, 225' : '255, 183, 197';
+          this.color = Math.random() > 0.5 ? '11, 11, 11' : '94, 94, 90';
         }
         
         this.vx = this.baseVx;
@@ -509,7 +314,7 @@ const TraceTrailBackground = () => {
         this.life = 1;
         this.angle = Math.random() * Math.PI * 2;
         this.spin = (Math.random() - 0.5) * 0.2;
-        this.color = Math.random() > 0.4 ? '255, 183, 197' : '232, 56, 61';
+        this.color = Math.random() > 0.4 ? '94, 94, 90' : '11, 11, 11';
       }
       update() {
         this.x += this.vx + Math.sin(this.life * 15) * 0.8;
@@ -570,203 +375,329 @@ const TraceTrailBackground = () => {
   );
 };
 
-// --- Kinetic Magnetic Typography Component ---
-const InteractiveTitle = ({ text, className = "" }) => {
-  const containerRef = useRef(null);
-  const lettersRef = useRef([]);
+export const getNavigationVisibility = ({ currentY, previousY, visible }) => {
+  if (currentY <= 48) return true;
+
+  const delta = currentY - previousY;
+  if (Math.abs(delta) < 6) return visible;
+  return delta < 0;
+};
+
+export const getNavigationMotion = (isActive, reducedMotion, isNavigating = false) => ({
+  autoAlpha: isActive ? 1 : 0,
+  y: isActive ? 0 : -56,
+  duration: reducedMotion ? 0 : (isNavigating ? 0.24 : (isActive ? 0.7 : 0.5)),
+  ease: reducedMotion ? 'none' : (isNavigating ? 'power2.out' : (isActive ? 'power4.out' : 'power3.in')),
+  overwrite: 'auto',
+});
+
+export const getFloatingNavigationActive = ({ currentView, isVisible, isNavigating }) =>
+  currentView === 'home' && isVisible && !isNavigating;
+
+const FloatingHomeNav = ({ currentView, onSection, isLoaded, isNavigating }) => {
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
+  const frameRef = useRef(null);
+  const motionRef = useRef(null);
 
   useEffect(() => {
-    let isResting = true;
+    if (currentView !== 'home') return undefined;
 
-    const handleMouseMove = (e) => {
-      if (!window.gsap || !containerRef.current) return;
-      
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const { clientX, clientY } = e;
-      
-      // Calculate optimization boundaries (skip math if mouse is far away)
-      const isFar = 
-        clientY < containerRect.top - 300 || 
-        clientY > containerRect.bottom + 300 ||
-        clientX < containerRect.left - 300 ||
-        clientX > containerRect.right + 300;
+    lastScrollYRef.current = window.scrollY;
+    setIsVisible(true);
 
-      if (isFar) {
-        if (!isResting) {
-          lettersRef.current.forEach((letter) => {
-            if (letter) {
-              window.gsap.to(letter, {
-                y: 0, x: 0, rotateZ: 0, rotateX: 0, color: 'inherit', textShadow: 'none', scale: 1,
-                duration: 1.5, ease: 'elastic.out(1, 0.3)', overwrite: "auto"
-              });
-            }
-          });
-          isResting = true;
-        }
-        return;
-      }
+    const handleScroll = () => {
+      if (frameRef.current !== null) return;
 
-      isResting = false;
-
-      // Magnetic field displacement for each letter
-      lettersRef.current.forEach((letter) => {
-        if (!letter) return;
-        const rect = letter.getBoundingClientRect();
-        
-        // Get absolute center of the specific letter
-        const letterCenterX = rect.left + rect.width / 2;
-        const letterCenterY = rect.top + rect.height / 2;
-
-        const distanceX = clientX - letterCenterX;
-        const distanceY = clientY - letterCenterY;
-        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-        const radius = 250; // generous radius for fluid feel
-
-        if (distance < radius) {
-          const force = Math.pow((radius - distance) / radius, 1.5);
-          
-          window.gsap.to(letter, {
-            y: -force * 40, // Elegant upward lift
-            x: (distanceX / distance) * -force * 20, // Gentle magnetic repel on X-axis
-            rotateZ: (distanceX / distance) * force * 15, // Smooth organic tilt
-            rotateX: force * 45, // 3D bend backward away from cursor
-            color: '#E8383D', // Vermilion red ignition
-            textShadow: '0px 20px 40px rgba(232,56,61,0.6)',
-            scale: 1 + force * 0.15,
-            duration: 0.5,
-            ease: 'power3.out',
-            overwrite: "auto"
-          });
-        } else {
-          // Graceful organic snap-back
-          window.gsap.to(letter, {
-            y: 0, x: 0, rotateZ: 0, rotateX: 0, color: 'inherit', textShadow: 'none', scale: 1,
-            duration: 1.2, ease: 'elastic.out(1, 0.3)', overwrite: "auto"
-          });
-        }
+      frameRef.current = window.requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        setIsVisible((visible) => getNavigationVisibility({
+          currentY,
+          previousY: lastScrollYRef.current,
+          visible,
+        }));
+        lastScrollYRef.current = currentY;
+        frameRef.current = null;
       });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    };
+  }, [currentView]);
+
+  const navItems = [
+    { label: 'work', target: 'works' },
+    { label: 'info', target: 'info' },
+    { label: 'contact', target: 'contact' },
+  ];
+
+  const isActive = getFloatingNavigationActive({ currentView, isVisible, isNavigating });
+
+  useLayoutEffect(() => {
+    if (!isLoaded || !window.gsap || !motionRef.current) return undefined;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tween = window.gsap.to(
+      motionRef.current,
+      getNavigationMotion(isActive, reducedMotion, isNavigating),
+    );
+
+    return () => tween.kill();
+  }, [isActive, isLoaded, isNavigating]);
 
   return (
-    <span
-      ref={containerRef}
-      className="flex whitespace-nowrap"
-      style={{ perspective: '1000px' }}
+    <nav
+      className={`floating-home-nav fixed left-1/2 top-6 z-[70] w-[min(78vw,27rem)] -translate-x-1/2 bg-transparent text-white mix-blend-difference md:top-8
+        ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}`}
+      aria-label="Portfolio navigation"
+      aria-hidden={!isActive}
     >
-      {text.split('').map((char, i) => (
-        <span
-          key={i}
-          ref={el => lettersRef.current[i] = el}
-          className={`inline-block relative z-10 will-change-transform cursor-none ${className}`}
-          style={{ transformOrigin: 'center bottom' }}
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </span>
-      ))}
-    </span>
+      <div ref={motionRef} className="flex w-full items-center justify-between will-change-transform" data-nav-motion="true">
+        {navItems.map((item) => (
+          <a
+            key={item.target}
+            href={`/${item.target}/`}
+            data-nav-target={item.target}
+            onClick={(event) => {
+              if (!window.gsap) return;
+              event.preventDefault();
+              onSection(item.target, event.currentTarget);
+            }}
+            tabIndex={isActive ? 0 : -1}
+            className="group project-link bg-transparent p-0 text-[11px] font-medium leading-[14px] tracking-[0.04em] text-current focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-current md:text-[12px] md:leading-[15px]"
+          >
+            <SplitHoverText text={item.label} height="15px" distance="14px" />
+          </a>
+        ))}
+      </div>
+    </nav>
   );
 };
 
-// --- LUXURIOUS COMING SOON OVERLAY ---
-const ComingSoonOverlay = ({ isOpen, onClose }) => {
+// --- Gallery View ---
+const EMPTY_CELLS = [
+  { cat: 'UI / UX',    wide: true  },
+  { cat: 'Web Design', wide: false },
+  { cat: 'UI / UX',    wide: false },
+  { cat: 'Web Design', wide: false },
+  { cat: 'UI / UX',    wide: false },
+  { cat: 'Web Design', wide: true  },
+];
+
+const GalleryView = ({ isLoaded }) => {
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [lightbox, setLightbox] = useState(null);
   const containerRef = useRef(null);
-  const curtainTopRef = useRef(null);
-  const curtainBottomRef = useRef(null);
-  const textContainerRef = useRef(null);
+  const lightboxRef = useRef(null);
+  const lineRef = useRef(null);
 
-  useEffect(() => {
-    if (!window.gsap) return;
-    const tl = window.gsap.timeline();
+  const filtered = activeCategory === 'All'
+    ? GALLERY_DATA
+    : GALLERY_DATA.filter(item => item.category === activeCategory);
 
-    if (isOpen) {
-      window.gsap.set(containerRef.current, { visibility: 'visible', pointerEvents: 'auto' });
-      
-      // Cinematic Split Curtain Entrance
-      tl.to([curtainTopRef.current, curtainBottomRef.current], {
-          height: "50vh",
-          duration: 1.2,
-          ease: "expo.inOut",
-          stagger: 0.1
-        })
-        .fromTo('.gallery-stagger', 
-          { y: 100, opacity: 0, rotateX: 15 },
-          { y: 0, opacity: 1, rotateX: 0, duration: 1.5, stagger: 0.1, ease: "power4.out" },
-          "-=0.6"
+  const isEmpty = filtered.length === 0;
+
+  useLayoutEffect(() => {
+    if (!isLoaded || !window.gsap) return;
+    const ctx = window.gsap.context(() => {
+      window.gsap.fromTo('.gal-header',
+        { y: 60, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.4, stagger: 0.08, ease: 'power4.out', delay: 0.1 }
+      );
+      if (isEmpty) {
+        window.gsap.fromTo('.gal-empty-cell',
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 1, stagger: 0.08, ease: 'power3.out', delay: 0.5 }
         );
-    } else {
-      // Exit Animation
-      tl.to('.gallery-stagger', { y: -50, opacity: 0, duration: 0.6, stagger: 0.05, ease: "power3.in" })
-        .to([curtainBottomRef.current, curtainTopRef.current], { 
-          height: "0vh", 
-          duration: 1, 
-          ease: "expo.inOut",
-          stagger: 0.1
-        }, "-=0.2")
-        .set(containerRef.current, { visibility: 'hidden', pointerEvents: 'none' });
+        if (lineRef.current) {
+          window.gsap.fromTo(lineRef.current,
+            { scaleX: 0 },
+            { scaleX: 1, duration: 1.6, ease: 'expo.inOut', delay: 0.3 }
+          );
+        }
+      } else {
+        window.gsap.fromTo('.gal-item',
+          { opacity: 0, y: 30, scale: 0.97 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.9, stagger: 0.07, ease: 'power3.out', delay: 0.5 }
+        );
+      }
+    }, containerRef);
+    return () => ctx.revert();
+  }, [isLoaded, activeCategory, isEmpty]);
+
+  const openLightbox = (item) => {
+    setLightbox(item);
+    if (window.gsap && lightboxRef.current) {
+      window.gsap.fromTo(lightboxRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4, ease: 'power2.out' }
+      );
     }
-  }, [isOpen]);
+  };
 
-  // Mouse Parallax Effect for the overlay text
-  useEffect(() => {
-    if (!isOpen || !window.gsap) return;
-    
-    const handleMouseMove = (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 80;
-      const y = (e.clientY / window.innerHeight - 0.5) * 80;
-      
-      window.gsap.to(textContainerRef.current, {
-        x: x,
-        y: y,
-        duration: 2,
-        ease: "power3.out"
+  const closeLightbox = () => {
+    if (window.gsap && lightboxRef.current) {
+      window.gsap.to(lightboxRef.current, {
+        opacity: 0, duration: 0.3, ease: 'power2.in',
+        onComplete: () => setLightbox(null)
       });
-    };
+    } else {
+      setLightbox(null);
+    }
+  };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isOpen]);
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightbox]);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[100] flex items-center justify-center invisible">
-      
-      {/* Split Curtains */}
-      <div ref={curtainTopRef} className="absolute top-0 left-0 w-full h-0 bg-[#050505] shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex flex-col justify-end overflow-hidden z-10">
-        <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+    <div ref={containerRef} className="w-full text-[#0b0b0b] pt-20 md:pt-32 min-h-screen flex flex-col z-10 relative">
+
+      {/* Header */}
+      <div className="mb-10 md:mb-16">
+        <p className="gal-header text-[#5e5e5a] text-[10px] tracking-[0.5em] uppercase font-light mb-5">The Collection</p>
+        <div className="overflow-hidden mb-6">
+          <h1 className="gal-header text-[16vw] sm:text-[10vw] md:text-[8vw] font-thin tracking-[-0.04em] uppercase leading-none">
+            Gallery
+          </h1>
+        </div>
+        <div ref={lineRef} className="w-full h-px bg-black/15 origin-left" />
       </div>
-      <div ref={curtainBottomRef} className="absolute bottom-0 left-0 w-full h-0 bg-[#050505] shadow-[0_-10px_30px_rgba(0,0,0,0.5)] overflow-hidden z-10">
-         <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
-      </div>
-      
-      {/* 3D Floating Text Container */}
-      <div ref={textContainerRef} className="relative z-20 flex flex-col items-center justify-center text-center px-4 w-full" style={{ perspective: '1000px' }}>
-        <div className="overflow-hidden mb-2 w-full">
-           <p className="gallery-stagger text-[#E8383D] font-light tracking-[0.4em] uppercase text-sm md:text-base w-full text-center">The Collection</p>
+
+      {isEmpty ? (
+        /* ── Premium empty state ── */
+        <div className="flex-1 flex flex-col">
+          <div className="gallery-grid pb-12">
+            {EMPTY_CELLS.map((cell, i) => (
+              <div
+                key={i}
+                className={`gal-empty-cell gallery-cell relative overflow-hidden ${cell.wide ? 'gallery-cell--wide' : ''}`}
+                style={{ '--delay': `${i * 0.12}s` }}
+              >
+                {/* Animated scan line */}
+                <div className="gal-scan-line" />
+                {/* Corner label */}
+                <span className="absolute top-4 left-4 text-[9px] tracking-[0.3em] uppercase text-[#767672] font-light select-none">
+                  {cell.cat}
+                </span>
+                {/* Number */}
+                <span className="absolute bottom-4 right-5 text-[11px] tracking-widest text-[#767672] font-light select-none tabular-nums">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Placeholder message */}
+          <div className="flex items-center gap-6 mt-4 mb-28 opacity-0 animate-[fadeInUp_0.8s_1.2s_ease-out_forwards]">
+            <div className="w-10 h-px bg-black/15" />
+            <p className="text-[10px] tracking-[0.4em] uppercase text-[#767672] font-light">
+              Curated works — uploading soon
+            </p>
+            <div className="w-10 h-px bg-black/15" />
+          </div>
         </div>
-        <div className="overflow-hidden pb-4 w-full flex justify-center">
-           <h2 className="gallery-stagger text-[12vw] md:text-[8vw] font-thin font-['Zen_Old_Mincho',_serif] uppercase tracking-tighter leading-none text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] w-full text-center">
-             Gallery
-           </h2>
+      ) : (
+        /* ── Populated grid ── */
+        <div className="gallery-grid pb-28">
+          {filtered.map((item) => (
+            <div
+              key={item.id}
+              className={`gal-item gallery-cell group relative overflow-hidden border border-black/10 cursor-pointer ${item.wide ? 'gallery-cell--wide' : ''}`}
+              onClick={() => openLightbox(item)}
+            >
+              <img
+                src={item.url}
+                alt={item.title}
+                className="w-full h-full object-cover grayscale opacity-75 group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-[1.04] transition-all duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4 md:p-5">
+                <p className="text-white/60 text-[9px] tracking-widest uppercase font-light mb-1">{item.category}</p>
+                <h3 className="text-xs md:text-sm font-light tracking-wide text-white leading-snug">{item.title}</h3>
+              </div>
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-50 transition-opacity duration-300">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                </svg>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="w-[1px] h-16 bg-gradient-to-b from-[#E8383D] to-transparent gallery-stagger my-6"></div>
-        <div className="overflow-hidden w-full">
-           <h3 className="gallery-stagger text-2xl md:text-3xl font-extralight tracking-[0.3em] text-white/80 uppercase mb-6 w-full text-center">Coming Soon</h3>
-        </div>
-        <div className="overflow-hidden w-full flex justify-center">
-           <p className="gallery-stagger font-extralight tracking-wide text-sm md:text-base text-white/50 max-w-md text-center leading-relaxed">
-             Not much to see here yet - but trust me, I’m working on it.
-           </p>
-        </div>
-        <div className="overflow-hidden mt-16 w-full flex justify-center">
-          <button onClick={onClose} className="gallery-stagger group relative font-light tracking-widest text-sm uppercase project-link text-white/60 hover:text-white transition-colors duration-300 py-2">
-            Return to Portfolio
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-full h-[1px] bg-[#E8383D] transition-all duration-500"></span>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          ref={lightboxRef}
+          className="fixed inset-0 z-[200] bg-white/97 text-[#0b0b0b] backdrop-blur-xl flex items-center justify-center p-4 md:p-16"
+          onClick={closeLightbox}
+        >
+          <button
+            className="absolute top-6 right-7 flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#767672] hover:text-[#0b0b0b] transition-colors duration-300 project-link z-10"
+            onClick={closeLightbox}
+          >
+            Close
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
           </button>
+          <img
+            src={lightbox.url}
+            alt={lightbox.title}
+            className="max-w-full max-h-[84vh] object-contain shadow-[0_0_100px_rgba(0,0,0,0.9)] rounded-sm"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="absolute bottom-6 left-0 right-0 text-center">
+            <p className="text-[#5e5e5a] text-[9px] tracking-[0.4em] uppercase font-light mb-1">{lightbox.category}</p>
+            <h3 className="text-xs font-light text-[#5e5e5a] tracking-wide">{lightbox.title}</h3>
+          </div>
         </div>
+      )}
+    </div>
+  );
+};
+
+// --- 3D Scroll-Reactive Orrery ---
+const ScrollOrrery = ({ isLoaded, triggerRef }) => {
+  const ring1Ref = useRef(null);
+  const ring2Ref = useRef(null);
+  const ring3Ref = useRef(null);
+  const dotRef2 = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!isLoaded || !window.gsap || !window.ScrollTrigger) return;
+    const st = { trigger: triggerRef.current, start: 'top bottom', end: 'bottom top', scrub: 2 };
+    const ctx = window.gsap.context(() => {
+      window.gsap.to(ring1Ref.current, { rotationZ: 360, ease: 'none', scrollTrigger: st });
+      window.gsap.to(ring2Ref.current, { rotationY: 360, ease: 'none', scrollTrigger: { ...st, scrub: 2.8 } });
+      window.gsap.to(ring3Ref.current, { rotationX: -360, ease: 'none', scrollTrigger: { ...st, scrub: 3.6 } });
+    });
+    return () => ctx.revert();
+  }, [isLoaded, triggerRef]);
+
+  const baseRing = {
+    position: 'absolute',
+    borderRadius: '50%',
+    top: '50%',
+    left: '50%',
+    transformStyle: 'preserve-3d',
+  };
+
+  return (
+    <div style={{ perspective: '700px', width: 260, height: 260, position: 'relative', margin: '0 auto' }}>
+      <div style={{ transformStyle: 'preserve-3d', width: 260, height: 260, position: 'relative', transform: 'rotateX(18deg) rotateY(22deg)' }}>
+        <div ref={ring1Ref} style={{ ...baseRing, width: 240, height: 240, marginTop: -120, marginLeft: -120, border: '1px solid rgba(11,11,11,0.32)', transform: 'rotateX(65deg)', transformStyle: 'preserve-3d' }} />
+        <div ref={ring2Ref} style={{ ...baseRing, width: 170, height: 170, marginTop: -85, marginLeft: -85, border: '1px solid rgba(11,11,11,0.12)', transform: 'rotateY(38deg)', transformStyle: 'preserve-3d' }} />
+        <div ref={ring3Ref} style={{ ...baseRing, width: 290, height: 290, marginTop: -145, marginLeft: -145, border: '1px solid rgba(11,11,11,0.05)', transform: 'rotateX(28deg) rotateZ(42deg)', transformStyle: 'preserve-3d' }} />
+        <div ref={dotRef2} style={{ position: 'absolute', width: 5, height: 5, background: '#0b0b0b', borderRadius: '50%', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', boxShadow: '0 0 14px rgba(11,11,11,0.5)' }} />
       </div>
     </div>
   );
@@ -774,432 +705,25 @@ const ComingSoonOverlay = ({ isOpen, onClose }) => {
 
 // --- Page Components ---
 
-const HomeView = ({ isLoaded }) => {
-  const heroRef = useRef(null);
-  const motivationRef = useRef(null);
+const HomeView = ({ isLoaded, onProjectClick }) => {
   const skillsRef = useRef(null);
-  const educationRef = useRef(null);
-  const experienceRef = useRef(null);
-  const awardsRef = useRef(null);
-  const contactRef = useRef(null);
-
-  useLayoutEffect(() => {
-    if (!isLoaded || !window.gsap) return;
-
-    const ctx = window.gsap.context(() => {
-      initFluidParallax(); // Apply the heavy floating lag to all [data-speed] elements!
-
-      // Hero Entry
-      window.gsap.fromTo(heroRef.current.querySelectorAll('.hero-anim-skew'),
-        { y: 80, opacity: 0, skewY: 5 },
-        { y: 0, opacity: 1, skewY: 0, duration: 1.2, stagger: 0.15, ease: "power4.out", delay: 0.1 }
-      );
-      window.gsap.fromTo(heroRef.current.querySelectorAll('.hero-anim-fade'),
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, stagger: 0.2, ease: "power3.out", delay: 0.4 }
-      );
-
-      // Motivation
-      if (motivationRef.current) {
-        window.gsap.fromTo(motivationRef.current.querySelectorAll('.mot-text'),
-          { x: -30, opacity: 0 },
-          { x: 0, opacity: 1, duration: 1.2, stagger: 0.15, ease: "power4.out", scrollTrigger: { trigger: motivationRef.current, start: "top 80%" } }
-        );
-        window.gsap.fromTo(motivationRef.current.querySelectorAll('.mot-img'),
-          { scale: 1.05, opacity: 0, filter: "blur(10px)" },
-          { scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.5, ease: "power3.out", scrollTrigger: { trigger: motivationRef.current, start: "top 75%" } }
-        );
-      }
-
-      // Skills
-      if (skillsRef.current) {
-        window.gsap.fromTo(skillsRef.current.querySelectorAll('.skill-pill'),
-          { y: 15, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: "back.out(1.5)", scrollTrigger: { trigger: skillsRef.current, start: "top 85%" } }
-        );
-      }
-
-      // Education
-      if (educationRef.current) {
-        const line = educationRef.current.querySelector('.edu-timeline-line');
-        const nodes = educationRef.current.querySelectorAll('.edu-node');
-        const items = educationRef.current.querySelectorAll('.edu-content');
-
-        window.gsap.to(line, { scaleY: 1, ease: "none", scrollTrigger: { trigger: educationRef.current, start: "top 60%", end: "bottom 80%", scrub: true } });
-        window.gsap.fromTo(nodes, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, stagger: 0.3, ease: "back.out(2)", scrollTrigger: { trigger: educationRef.current, start: "top 75%" } });
-        window.gsap.fromTo(items, { x: 30, opacity: 0, scale: 0.98 }, { x: 0, opacity: 1, scale: 1, duration: 1.2, stagger: 0.3, ease: "power4.out", scrollTrigger: { trigger: educationRef.current, start: "top 75%" } });
-      }
-
-      // Experience (Entry isolated to opacity/filter to allow data-speed Y-axis parallax)
-      if (experienceRef.current) {
-        window.gsap.fromTo(experienceRef.current.querySelectorAll('.exp-item'),
-          { opacity: 0, filter: "blur(10px)" },
-          { opacity: 1, filter: "blur(0px)", duration: 1.2, stagger: 0.15, ease: "power4.out", scrollTrigger: { trigger: experienceRef.current, start: "top 80%" } }
-        );
-      }
-
-      // Awards (Changed to vertical list entry)
-      if (awardsRef.current) {
-        window.gsap.fromTo(awardsRef.current.querySelectorAll('.award-item'),
-          { opacity: 0, y: 40 },
-          { opacity: 1, y: 0, duration: 1.2, stagger: 0.1, ease: "power4.out", scrollTrigger: { trigger: awardsRef.current, start: "top 85%" } }
-        );
-      }
-
-      // Cinematic Contact Reveal
-      if (contactRef.current) {
-        window.gsap.fromTo(contactRef.current.querySelectorAll('.contact-reveal'),
-          { y: "120%", opacity: 0 },
-          { y: "0%", opacity: 1, duration: 1.4, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: contactRef.current, start: "top 85%" } }
-        );
-        window.gsap.fromTo(contactRef.current.querySelector('.contact-line'),
-          { scaleX: 0 },
-          { scaleX: 1, duration: 1.5, ease: "expo.inOut", scrollTrigger: { trigger: contactRef.current, start: "top 85%" } }
-        );
-      }
-    });
-
-    return () => ctx.revert();
-  }, [isLoaded]);
 
   return (
     <>
-      <section ref={heroRef} className="min-h-[80vh] flex items-center pt-32 md:pt-48">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 w-full items-center">
-          <div className="lg:col-span-7 flex flex-col justify-center text-white relative z-10 will-change-transform" data-speed="1.2">
-            
-            {/* Luxury Editorial Typography Lockup */}
-            <div className="relative mb-8 md:mb-12">
-              <div className="absolute -left-6 md:-left-12 top-4 bottom-0 flex items-start opacity-0 hero-anim-fade hidden md:flex">
-                 <span className="font-['Zen_Old_Mincho',_serif] text-xs tracking-[0.8em] text-[#E8383D] opacity-60" style={{ writingMode: 'vertical-rl' }}>
-                   ウェブ開発者
-                 </span>
-              </div>
-              <h1 className="flex flex-col items-start opacity-0 hero-anim-skew">
-                <InteractiveTitle 
-                  text="JOVAN" 
-                  className="font-['Zen_Old_Mincho',_serif] text-7xl md:text-9xl lg:text-[11rem] tracking-[-0.02em] leading-[0.85] text-white" 
-                />
-                <InteractiveTitle 
-                  text="CHANDRA" 
-                  className="text-xl md:text-3xl lg:text-4xl font-extralight tracking-[0.4em] md:tracking-[0.7em] text-white/60 mt-2 md:mt-6 ml-1 md:ml-2" 
-                />
-              </h1>
-            </div>
+      <EditorialHero isLoaded={isLoaded} />
+      <ProfileStorySection isLoaded={isLoaded} />
 
-            <p className="text-lg md:text-xl font-extralight opacity-80 tracking-wide mb-24 opacity-0 hero-anim-fade">
-              Final Year Business Information System Student <span className="text-[#E8383D] mx-2">/</span> Website Designer
-            </p>
+      <FeaturedProjectsSection
+        isLoaded={isLoaded}
+        projects={PROJECTS_DATA}
+        onProjectClick={onProjectClick}
+      />
 
-            <div className="mt-8 md:mt-16 opacity-0 hero-anim-fade">
-              <p className="text-sm md:text-base font-light opacity-70 leading-relaxed max-w-xs">
-                For business inquiries, email me at<br/>
-                <a href="mailto:jovan.rc1212@gmail.com" className="inline-block mt-1 border-b border-transparent hover:border-[#E8383D] hover:text-[#E8383D] hover:drop-shadow-[0_0_8px_rgba(232,56,61,0.5)] transition-all duration-500 pb-1 project-link">jovan.rc1212@gmail.com</a>
-              </p>
-            </div>
-          </div>
+      <SkillsAccordion sectionRef={skillsRef} isLoaded={isLoaded} />
 
-          <div className="lg:col-span-5 lg:pl-12 text-white relative z-10 opacity-0 hero-anim-fade will-change-transform" data-speed="0.8">
-            <div className="mb-6 border-b border-white/20 pb-4">
-              <h2 className="text-xl md:text-2xl font-light tracking-widest uppercase">About Me</h2>
-            </div>
-            <div className="space-y-6 text-sm md:text-base font-extralight opacity-80 leading-relaxed">
-              <p className="hover:text-[#E8383D] transition-colors duration-300">I am currently in my final year of Bachelor of Information Technology at Asia Pacific University.</p>
-              <p className="hover:text-[#E8383D] transition-colors duration-300">My primary focus is on web development and UI/UX design, supported by hands-on experience through several university projects. I enjoy exploring emerging technologies and experimenting with creative ideas to build innovative digital solutions.</p>
-              <p className="hover:text-[#E8383D] transition-colors duration-300">Beyond academics, I actively engage in sports such as badminton and pickleball, which help me maintain a balanced and disciplined lifestyle.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <SignatureMarqueeSection isLoaded={isLoaded} />
 
-      <section ref={motivationRef} className="mt-24 md:mt-48 text-white relative z-10">
-        <div className="border-b border-white/20 pb-4 mb-12 will-change-transform" data-speed="0.2">
-          <h2 className="text-2xl font-light tracking-widest uppercase mot-text">Motivation</h2>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          <div className="space-y-6 text-base md:text-lg font-extralight opacity-80 leading-relaxed max-w-xl will-change-transform" data-speed="0.4">
-            <p className="mot-text hover:text-[#E8383D] transition-colors duration-300">I am a full-stack developer with a strong interest in frontend development. I enjoy exploring new ideas and technologies, especially in web development. I like discovering new libraries, testing new features, and building better user experiences.</p>
-            <p className="mot-text hover:text-[#E8383D] transition-colors duration-300">I am also learning beyond web development, especially in Artificial Intelligence. I’m exploring how AI works in chatbots and Robotic Process Automation (RPA). This helps me understand how technology can solve real-world problems.</p>
-            <p className="mot-text hover:text-[#E8383D] transition-colors duration-300">I am still exploring my career path and where I can grow the most. I enjoy building solutions that make users happy, especially through websites. For now, I am focused on improving my technical, design, and business skills.</p>
-          </div>
-          <div className="w-full aspect-[4/3] bg-[#0a0a0a] overflow-hidden relative border border-white/10 group shadow-[0_0_30px_rgba(255,255,255,0.02)] mot-img will-change-transform" data-speed="0.6">
-            <div className="absolute inset-0 bg-[#E8383D]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-10 pointer-events-none mix-blend-overlay"></div>
-            <img 
-                src={motivationImg} 
-                alt="My Motivation" 
-                className="w-full h-full object-cover grayscale opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)]"
-              />
-          </div>
-        </div>
-      </section>
-
-      <section ref={skillsRef} className="mt-32 md:mt-48 text-white relative z-10">
-        <div className="border-b border-white/20 pb-4 mb-16 will-change-transform" data-speed="0.2">
-          <h2 className="text-2xl font-light tracking-widest uppercase">Skills</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-          <div className="will-change-transform" data-speed="0.3">
-            <h3 className="text-lg md:text-xl font-light tracking-widest uppercase mb-8 text-[#E8383D]">Frontend</h3>
-            <div className="flex flex-wrap gap-3">
-              {FRONTEND_SKILLS.map((skill) => (
-                <div key={skill.name} className="overflow-hidden p-1 -m-1">
-                  <span 
-                    className="skill-pill block border border-white/20 rounded-full px-5 py-2 text-sm font-extralight hover:bg-transparent hover:text-[#E8383D] hover:border-[#E8383D] hover:-translate-y-1 hover:shadow-[0_0_15px_rgba(232,56,61,0.4)] transition-all duration-300 cursor-none"
-                    data-cursor-img={skill.url}
-                    data-cursor-type="skill"
-                  >
-                    {skill.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="will-change-transform" data-speed="0.5">
-            <h3 className="text-lg md:text-xl font-light tracking-widest uppercase mb-8 text-[#E8383D]">Backend</h3>
-            <div className="flex flex-wrap gap-3">
-              {BACKEND_SKILLS.map((skill) => (
-                <div key={skill.name} className="overflow-hidden p-1 -m-1">
-                  <span 
-                    className="skill-pill block border border-white/20 rounded-full px-5 py-2 text-sm font-extralight hover:bg-transparent hover:text-[#E8383D] hover:border-[#E8383D] hover:-translate-y-1 hover:shadow-[0_0_15px_rgba(232,56,61,0.4)] transition-all duration-300 cursor-none"
-                    data-cursor-img={skill.url}
-                    data-cursor-type="skill"
-                  >
-                    {skill.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="will-change-transform" data-speed="0.7">
-            <h3 className="text-lg md:text-xl font-light tracking-widest uppercase mb-8 text-[#E8383D]">Tools</h3>
-            <div className="flex flex-wrap gap-3">
-              {TOOL_SKILLS.map((skill) => (
-                <div key={skill.name} className="overflow-hidden p-1 -m-1">
-                  <span 
-                    className="skill-pill block border border-white/20 rounded-full px-5 py-2 text-sm font-extralight hover:bg-transparent hover:text-[#E8383D] hover:border-[#E8383D] hover:-translate-y-1 hover:shadow-[0_0_15px_rgba(232,56,61,0.4)] transition-all duration-300 cursor-none"
-                    data-cursor-img={skill.url}
-                    data-cursor-type="skill"
-                  >
-                    {skill.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section ref={educationRef} className="mt-32 md:mt-48 text-white relative z-10">
-        <div className="border-b border-white/20 pb-4 mb-16 will-change-transform" data-speed="0.2">
-          <h2 className="text-2xl font-light tracking-widest uppercase">Education</h2>
-        </div>
-
-        <div className="relative border-l-0 ml-2 md:ml-4 space-y-24 pb-8">
-          <div className="absolute top-4 left-[5px] w-[1px] h-full bg-white/10 hidden md:block"></div>
-          <div className="absolute top-4 left-[4.5px] w-[2px] h-full bg-[#E8383D] origin-top scale-y-0 edu-timeline-line hidden md:block z-0 shadow-[0_0_10px_rgba(232,56,61,0.5)]"></div>
-
-          
-
-          <div 
-            className="relative md:pl-16 group cursor-none will-change-transform"
-            data-speed="0.3"
-            data-cursor-img="https://backend.studyfans.com/storage/media/Universities/main_image/2784/HZojmHanwatI1sXj7diGynUsWP9wkIa64NOSyIGg.webp"
-            data-cursor-type="education"
-          >
-            <div className="absolute top-3 left-0 w-3 h-3 rounded-full bg-[#111111] border-[1.5px] border-white/30 group-hover:border-[#E8383D] group-hover:bg-[#E8383D] group-hover:scale-150 group-hover:shadow-[0_0_20px_rgba(232,56,61,0.8)] transition-all duration-500 z-10 hidden md:block edu-node"></div>
-            
-            <div className="edu-content">
-              <p className="text-[#E8383D] text-xs md:text-sm tracking-widest uppercase mb-3 font-light">Sept 2023 — Sept 2026</p>
-              <h3 className="text-3xl md:text-5xl font-thin tracking-wide mb-4 text-white group-hover:text-[#E8383D] group-hover:translate-x-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]">Asia Pacific University</h3>
-              <p className="text-base md:text-lg font-extralight opacity-70 max-w-2xl leading-relaxed group-hover:translate-x-3 transition-all duration-500 delay-75 ease-[cubic-bezier(0.16,1,0.3,1)]">
-                Bachelor of Information Technology with a Specialism in Business Information System.
-              </p>
-              <p className="text-base md:text-lg font-extralight opacity-70 max-w-2xl leading-relaxed group-hover:translate-x-3 transition-all duration-500 delay-75 ease-[cubic-bezier(0.16,1,0.3,1)]">
-                GPA : 3.6/4.0
-              </p>
-            </div>
-          </div>
-
-          <div 
-            className="relative md:pl-16 group cursor-none will-change-transform"
-            data-speed="0.5"
-            data-cursor-img="https://iics.sch.id/wp-content/uploads/2021/10/IPEKA-INTEGRATED.webp"
-            data-cursor-type="education"
-          >
-            <div className="absolute top-3 left-0 w-3 h-3 rounded-full bg-[#111111] border-[1.5px] border-white/30 group-hover:border-[#E8383D] group-hover:bg-[#E8383D] group-hover:scale-150 group-hover:shadow-[0_0_20px_rgba(232,56,61,0.8)] transition-all duration-500 z-10 hidden md:block edu-node"></div>
-            
-            <div className="edu-content">
-              <p className="text-[#E8383D] text-xs md:text-sm tracking-widest uppercase mb-3 font-light">Jul 2020 — May 2023</p>
-              <h3 className="text-3xl md:text-5xl font-thin tracking-wide mb-4 text-white group-hover:text-[#E8383D] group-hover:translate-x-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]">IPEKA Senior Highschool</h3>
-              <p className="text-base md:text-lg font-extralight opacity-70 max-w-2xl leading-relaxed group-hover:translate-x-3 transition-all duration-500 delay-75 ease-[cubic-bezier(0.16,1,0.3,1)]">
-                Social Sciences.
-              </p>
-              <p className="text-base md:text-lg font-extralight opacity-70 max-w-2xl leading-relaxed group-hover:translate-x-3 transition-all duration-500 delay-75 ease-[cubic-bezier(0.16,1,0.3,1)]">
-                Score : 86/100
-              </p>
-            </div>
-          </div>
-
-          
-        </div>
-      </section>
-
-      {/* --- Interactive Experience Section --- */}
-      <section ref={experienceRef} className="mt-32 md:mt-48 text-white relative z-10">
-        <div className="border-b border-white/20 pb-4 mb-12 will-change-transform" data-speed="0.2">
-          <h2 className="text-2xl font-light tracking-widest uppercase">Experience</h2>
-        </div>
-        
-        <div className="flex flex-col w-full border-b border-white/20">
-          {EXPERIENCE_DATA.map((item, i) => (
-            <div key={item.id} className="exp-item relative border-t border-white/20 py-10 md:py-16 group cursor-none project-link overflow-hidden will-change-transform" data-speed={0.3 + (i * 0.2)}>
-              {/* Sweeping Red Background Line Hover */}
-              <div className="absolute top-0 left-0 w-full h-[2px] bg-[#E8383D] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] z-10"></div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 items-start md:items-center relative z-20">
-                <div className="md:col-span-3">
-                  <p className="text-xs md:text-sm font-light tracking-[0.2em] text-white/50 group-hover:text-white transition-colors duration-500">{item.period}</p>
-                </div>
-                <div className="md:col-span-5 flex flex-col group-hover:translate-x-4 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
-                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-thin tracking-wide text-white mb-2">{item.company}</h3>
-                  <p className="text-[#E8383D] text-xs md:text-sm tracking-widest uppercase font-medium">{item.role}</p>
-                </div>
-                <div className="md:col-span-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] mt-4 md:mt-0">
-                  <p className="text-sm font-extralight text-white/70 leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- Awards & Certifications Section --- */}
-      <section ref={awardsRef} className="mt-32 md:mt-48 text-white relative z-10">
-        <div className="border-b border-white/20 pb-4 mb-12 will-change-transform" data-speed="0.2">
-          <h2 className="text-2xl font-light tracking-widest uppercase">Awards & Certifications</h2>
-        </div>
-
-        <div className="flex flex-col w-full">
-          {AWARDS_DATA.map((award, i) => (
-            <div 
-              key={award.id} 
-              className="award-item group flex flex-col md:flex-row md:items-center justify-between border-t border-white/20 py-8 md:py-12 cursor-none project-link will-change-transform relative overflow-hidden" 
-              data-speed={0.2 + (i * 0.1)}
-              data-cursor-img={award.img}
-              data-cursor-type="education" // Reusing the large cinematic cursor from Education!
-            >
-              {/* Sweeping Bottom Red Line Hover */}
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-[#E8383D] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] z-10"></div>
-
-              <div className="flex items-baseline gap-6 md:gap-12 relative z-20 group-hover:translate-x-6 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] w-full md:w-auto">
-                <span className="text-sm font-light tracking-widest text-white/40 group-hover:text-[#E8383D] transition-colors duration-500 w-12 md:w-16 shrink-0">
-                  {award.year}
-                </span>
-                <h3 className="text-2xl md:text-4xl lg:text-5xl font-thin tracking-wide text-white group-hover:text-white transition-colors duration-500 font-['Zen_Old_Mincho',_serif]">
-                  {award.title}
-                </h3>
-              </div>
-              
-              <div className="relative z-20 opacity-60 group-hover:opacity-100 transition-opacity duration-500 md:text-right mt-4 md:mt-0 pl-[4.5rem] md:pl-0">
-                <span className="text-xs md:text-sm font-extralight tracking-widest uppercase text-white/80 group-hover:text-[#E8383D]">
-                  {award.issuer}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- Grand Cinematic Contact / Footer Section --- */}
-      <section ref={contactRef} className="mt-40 md:mt-56 text-white relative z-10 pb-8 md:pb-12">
-        
-        {/* Massive Screen-Spanning Typography */}
-        <div className="w-full flex flex-col mb-16 md:mb-24 uppercase select-none">
-          <div className="overflow-hidden will-change-transform" data-speed="0.2">
-            <p className="text-[#E8383D] font-['Zen_Old_Mincho',_serif] tracking-[0.4em] text-sm md:text-base contact-reveal mb-4 ml-2">お問い合わせ</p>
-          </div>
-          <div className="overflow-hidden w-full will-change-transform" data-speed="0.8">
-            <h2 className="text-[14vw] md:text-[11vw] leading-[0.85] font-thin tracking-tighter contact-reveal">LET'S</h2>
-          </div>
-          <div className="overflow-hidden w-full flex justify-center md:pl-[10vw] will-change-transform" data-speed="0.5">
-            <h2 className="text-[14vw] md:text-[11vw] leading-[0.85] font-thin tracking-tighter contact-reveal text-white/80">WORK</h2>
-          </div>
-          <div className="overflow-hidden w-full flex justify-end will-change-transform" data-speed="0.2">
-            <h2 className="text-[14vw] md:text-[11vw] leading-[0.85] font-thin tracking-tighter contact-reveal font-['Zen_Old_Mincho',_serif] italic text-white/40">
-              TOGETHER<span className="text-[#E8383D] not-italic">.</span>
-            </h2>
-          </div>
-        </div>
-
-        {/* Animated Hairline Divider */}
-        <div className="w-full h-[1px] bg-white/20 origin-left contact-line mb-12 md:mb-16"></div>
-
-        {/* High-End Editorial Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 items-end">
-          
-          {/* Time & Location (Span 4) */}
-          <div className="md:col-span-4 flex flex-col gap-8 md:gap-12 will-change-transform" data-speed="0.3">
-            <div className="overflow-hidden">
-              <div className="contact-reveal flex flex-col gap-2">
-                <span className="text-[10px] md:text-xs tracking-[0.2em] uppercase opacity-40">Local Time</span>
-                <LiveClock />
-              </div>
-            </div>
-            <div className="overflow-hidden">
-              <div className="contact-reveal flex flex-col gap-2">
-                <span className="text-[10px] md:text-xs tracking-[0.2em] uppercase opacity-40">Location</span>
-                <span className="font-light tracking-widest text-base md:text-lg">Kuala Lumpur, <span className="text-[#E8383D]">MY</span></span>
-              </div>
-            </div>
-          </div>
-
-          {/* Socials (Span 3) */}
-          <div className="md:col-span-3 flex flex-col gap-4 will-change-transform" data-speed="0.5">
-            <div className="overflow-hidden mb-2">
-              <span className="text-[10px] md:text-xs tracking-[0.2em] uppercase opacity-40 contact-reveal block">Socials</span>
-            </div>
-            {[
-              { name: 'LinkedIn', url: 'https://www.linkedin.com/in/jovan-richaldy/' },
-              { name: 'Instagram', url: 'https://www.instagram.com/jovanrichaldy/?hl=en' },
-              { name: 'GitHub', url: 'https://github.com/urboiflex' }
-            ].map((social, i) => (
-              <div key={social.name} className="overflow-hidden">
-                <a href={social.url} target="_blank" rel="noopener noreferrer" className="contact-reveal block font-light tracking-widest text-sm md:text-base hover:text-[#E8383D] transition-colors duration-500 project-link w-max">
-                  {social.name}
-                </a>
-              </div>
-            ))}
-          </div>
-
-          {/* Huge Interactive Email (Span 5) */}
-          <div className="md:col-span-5 flex flex-col md:items-end justify-end mt-8 md:mt-0 will-change-transform" data-speed="0.7">
-            <div className="overflow-hidden w-full md:w-auto">
-              <div className="contact-reveal flex flex-col gap-4 w-full md:items-end">
-                <span className="text-[10px] md:text-xs tracking-[0.2em] uppercase opacity-40 text-left md:text-right w-full">Drop an Email</span>
-                
-                <a href="mailto:jovan.rc1212@gmail.com" className="group flex flex-col items-start md:items-end gap-2 project-link w-full md:w-max">
-                  <div className="relative overflow-hidden pb-2">
-                    <span className="block text-2xl md:text-4xl lg:text-5xl font-thin tracking-wider text-white transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-[120%]">
-                      jovan.rc1212@gmail.com
-                    </span>
-                    <span className="absolute top-0 left-0 block text-2xl md:text-4xl lg:text-5xl font-thin tracking-wider text-[#E8383D] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] translate-y-[120%] group-hover:translate-y-0">
-                      jovan.rc1212@gmail.com
-                    </span>
-                  </div>
-                  {/* Magnetic underline effect */}
-                  <div className="w-full h-[1px] bg-white/20 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[#E8383D] -translate-x-[101%] group-hover:translate-x-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"></div>
-                  </div>
-                </a>
-
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
+      <CinematicContactSection isLoaded={isLoaded} />
     </>
   );
 };
@@ -1212,84 +736,132 @@ const WorksView = ({ isLoaded, onProjectClick }) => {
   useLayoutEffect(() => {
     if (!isLoaded || !window.gsap || !window.ScrollTrigger) return;
 
+    let mm = window.gsap.matchMedia();
+
     const ctx = window.gsap.context(() => {
-      initFluidParallax(); 
-      
-      // Header Animation
+      // General Header entry
       window.gsap.fromTo('.works-header-anim', 
         { y: 40, opacity: 0 }, 
         { y: 0, opacity: 1, duration: 1.2, stagger: 0.1, ease: "power4.out", delay: 0.1 }
       );
 
-      // ScrollTrigger for tracking which image is currently in the viewport
-      PROJECTS_DATA.forEach((_, i) => {
-        window.ScrollTrigger.create({
-          trigger: `.project-img-container-${i}`,
-          start: "top 50%", 
-          end: "bottom 50%",
-          onToggle: (self) => {
-            if (self.isActive) setActiveIndex(i);
-          }
-        });
-        
-        // Image Parallax Entrance
-        window.gsap.fromTo(`.project-img-container-${i} .project-card`,
-          { opacity: 0, y: 100, scale: 0.95 },
-          { 
-            opacity: 1, 
-            y: 0, 
-            scale: 1, 
-            duration: 1.5, 
-            ease: "power4.out",
-            scrollTrigger: {
-              trigger: `.project-img-container-${i}`,
-              start: "top 85%",
+      // Desktop Only - Vertical Parallax Scroll
+      mm.add("(min-width: 1024px)", () => {
+        initFluidParallax(); 
+
+        PROJECTS_DATA.forEach((_, i) => {
+          window.ScrollTrigger.create({
+            trigger: `.desktop-img-container-${i}`,
+            start: "top 50%", 
+            end: "bottom 50%",
+            onToggle: (self) => {
+              if (self.isActive) setActiveIndex(i);
             }
+          });
+          
+          window.gsap.fromTo(`.desktop-img-container-${i} .project-card`,
+            { opacity: 0, y: 100, scale: 0.95 },
+            { 
+              opacity: 1, y: 0, scale: 1, duration: 1.5, ease: "power4.out",
+              scrollTrigger: { trigger: `.desktop-img-container-${i}`, start: "top 85%" }
+            }
+          );
+        });
+      });
+
+      // Mobile Only - Horizontal Swipe Fade
+      mm.add("(max-width: 1023px)", () => {
+        window.gsap.fromTo(".mobile-project-card",
+          { opacity: 0, x: 30 },
+          { 
+            opacity: 1, x: 0, duration: 1, stagger: 0.15, ease: "power3.out",
+            scrollTrigger: { trigger: ".mobile-slider-container", start: "top 90%" }
           }
         );
       });
+
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      mm.revert();
+    }
   }, [isLoaded]);
 
   return (
-    <div ref={containerRef} className="w-full text-white pt-24 md:pt-32 min-h-screen flex flex-col z-10 relative">
-      <div className="flex flex-col lg:flex-row w-full relative items-start gap-12 lg:gap-24 pb-32">
+    <div ref={containerRef} className="w-full text-[#0b0b0b] pt-20 md:pt-32 min-h-screen flex flex-col z-10 relative">
+      <div className="flex flex-col lg:flex-row w-full relative items-start gap-8 lg:gap-24 pb-20 md:pb-32">
         
-        {/* Left Side: Scrollable Images */}
+        {/* Left Side Container (Handles Both Desktop Images & Mobile Slider) */}
         <div className="w-full lg:w-7/12 flex flex-col">
-          {PROJECTS_DATA.map((project, idx) => (
-            <div
-              key={`img-${project.id}`}
-              className={`project-img-container-${idx} w-full min-h-[60vh] md:min-h-[80vh] lg:min-h-screen flex items-center justify-center py-12 lg:py-24`}
-            >
-              <div 
-                className="w-full aspect-[4/3] lg:aspect-[16/10] overflow-hidden relative project-card view-project-cursor border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] group rounded-sm will-change-transform"
-                onClick={() => onProjectClick(project.id)}
-                data-speed="0.4"
-              >
-                <div className="absolute inset-0 bg-[#E8383D]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10 mix-blend-overlay pointer-events-none"></div>
-                <img 
-                  src={project.img} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
-                />
+          
+          {/* Mobile Header (Hidden on PC) */}
+          <div className="flex lg:hidden justify-between items-end mb-4 border-b border-black/20 pb-4 works-header-anim">
+            <h2 className="text-2xl font-light tracking-widest uppercase">Works</h2>
+            <span className="font-extralight tracking-wider opacity-50 text-[10px] flex items-center gap-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              SWIPE
+            </span>
+          </div>
+
+          {/* Mobile Horizontal Snap Slider (Hidden on PC) - Added data-lenis-prevent and touch-pan-x */}
+          <div 
+            className="flex lg:hidden w-full overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-6 pb-6 -mx-6 px-6 relative mobile-slider-container touch-pan-x"
+            data-lenis-prevent="true"
+          >
+            {PROJECTS_DATA.map((project, idx) => (
+              <div key={`mobile-${project.id}`} className="min-w-[85vw] sm:min-w-[60vw] snap-center flex flex-col gap-4 mobile-project-card">
+                  <div
+                      className="w-full aspect-[4/3] rounded-md overflow-hidden relative project-card border border-black/10 shadow-[0_10px_20px_rgba(0,0,0,0.5)] group mobile-no-parallax cursor-pointer"
+                      onClick={() => onProjectClick(project.id)}
+                  >
+                      <div className="absolute inset-0 bg-black/10 opacity-0 active:opacity-100 transition-opacity duration-300 z-10 mix-blend-overlay pointer-events-none"></div>
+                      <img src={project.img} alt={project.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex flex-col px-1">
+                      <h3 className="text-xl font-thin mb-1 text-[#0b0b0b] active:text-[#5e5e5a] transition-colors line-clamp-1 cursor-pointer" onClick={() => onProjectClick(project.id)}>
+                          {project.title}
+                      </h3>
+                      <p className="text-[#5e5e5a] text-[10px] uppercase mb-2 font-light tracking-widest">{project.category}</p>
+                      <p className="text-xs font-extralight opacity-70 leading-relaxed line-clamp-3">{project.desc}</p>
+                  </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Desktop Vertical Stacking Images (Hidden on Mobile) */}
+          <div className="hidden lg:flex flex-col w-full">
+            {PROJECTS_DATA.map((project, idx) => (
+              <div
+                key={`img-${project.id}`}
+                className={`desktop-img-container-${idx} w-full min-h-screen flex items-center justify-center py-24`}
+              >
+                <div 
+                  className="w-full aspect-[16/10] overflow-hidden relative project-card view-project-cursor border border-black/10 shadow-[0_0_30px_rgba(0,0,0,0.5)] group rounded-sm will-change-transform"
+                  onClick={() => onProjectClick(project.id)}
+                  data-speed="0.4"
+                >
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 z-10 mix-blend-overlay pointer-events-none"></div>
+                  <img 
+                    src={project.img} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-[1500ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Right Side: Sticky Dynamic Text Wrapper */}
-        <div className="w-full lg:w-5/12 lg:sticky lg:top-[25vh] h-auto lg:h-[50vh] flex flex-col justify-start pointer-events-none pt-12 lg:pt-0">
-          
-          <div className="border-b border-white/20 pb-6 mb-12 flex justify-between items-end overflow-hidden shrink-0 pointer-events-auto works-header-anim">
+        {/* Right Side: Desktop Sticky Text Wrapper (Hidden on Mobile) */}
+        <div className="hidden lg:flex w-5/12 sticky top-24 h-[calc(100vh-6rem)] flex-col justify-start pointer-events-none pt-0">
+
+          <div className="border-b border-black/20 pb-4 mb-8 flex justify-between items-end overflow-hidden shrink-0 pointer-events-auto works-header-anim">
             <h2 className="text-3xl md:text-4xl font-light tracking-widest uppercase">Works</h2>
             <span className="font-extralight tracking-wider opacity-50 text-sm md:text-base">/jovanchandra</span>
           </div>
 
-          {/* Animated Number Sequence Tape (Slot Machine Effect) */}
-          <div className="mb-6 flex items-center font-light tracking-widest text-sm opacity-60 pointer-events-auto works-header-anim">
+          <div className="mb-4 flex items-center font-light tracking-widest text-sm opacity-60 pointer-events-auto works-header-anim shrink-0">
             <span>[ 0</span>
             <div className="overflow-hidden h-[20px] relative w-[12px]">
               <div className="absolute top-0 left-0 w-full flex flex-col transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style={{ transform: `translateY(-${activeIndex * 20}px)` }}>
@@ -1301,30 +873,36 @@ const WorksView = ({ isLoaded, onProjectClick }) => {
             <span>&nbsp;/ 0{PROJECTS_DATA.length} ]</span>
           </div>
 
-          {/* Absolute Stacked Text Containers */}
-          <div className="relative flex-1 w-full min-h-[30vh] works-header-anim">
+          <div className="relative flex-1 w-full min-h-0 works-header-anim overflow-hidden">
             {PROJECTS_DATA.map((project, idx) => (
               <div
                 key={`desc-${project.id}`}
-                className={`absolute inset-0 flex flex-col transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] 
-                  ${activeIndex === idx 
-                    ? 'opacity-100 translate-y-0 pointer-events-auto delay-100' 
-                    : activeIndex > idx 
-                      ? 'opacity-0 -translate-y-16 pointer-events-none' 
+                className={`absolute inset-0 flex flex-col transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)]
+                  ${activeIndex === idx
+                    ? 'opacity-100 translate-y-0 pointer-events-auto delay-100'
+                    : activeIndex > idx
+                      ? 'opacity-0 -translate-y-16 pointer-events-none'
                       : 'opacity-0 translate-y-16 pointer-events-none'}`}
               >
-                <h3 
-                  className="text-4xl md:text-5xl lg:text-6xl font-thin tracking-wide mb-4 leading-tight font-['Zen_Old_Mincho',_serif] text-white hover:text-[#E8383D] transition-colors duration-500 view-project-cursor"
+                <h3
+                  className="text-3xl md:text-4xl lg:text-5xl font-thin tracking-[-0.025em] mb-3 leading-tight text-[#0b0b0b] hover:text-[#5e5e5a] transition-colors duration-500 view-project-cursor cursor-pointer shrink-0"
                   onClick={() => onProjectClick(project.id)}
                 >
                   {project.title}
                 </h3>
-                <p className="text-[#E8383D] font-light tracking-wide text-sm md:text-base uppercase mb-6">
+                <p className="text-[#5e5e5a] font-light tracking-wide text-sm uppercase mb-4 shrink-0">
                   {project.category}
                 </p>
-                <p className="text-base md:text-lg font-extralight opacity-70 leading-relaxed max-w-lg">
+                <p className="text-sm md:text-base font-extralight opacity-70 leading-relaxed max-w-lg mb-8 shrink-0">
                   {project.desc}
                 </p>
+                <button
+                  onClick={() => onProjectClick(project.id)}
+                  className="group flex items-center gap-4 text-[10px] tracking-[0.3em] uppercase font-light text-[#5e5e5a] hover:text-[#0b0b0b] transition-all duration-500 pointer-events-auto view-project-cursor shrink-0 w-max"
+                >
+                  <span className="w-6 h-px bg-[#0b0b0b]/30 group-hover:w-14 group-hover:bg-black transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"></span>
+                  View Project
+                </button>
               </div>
             ))}
           </div>
@@ -1338,8 +916,6 @@ const WorksView = ({ isLoaded, onProjectClick }) => {
 // --- Project Detail Template Component ---
 const ProjectDetailView = ({ project, nextProject, onBack, onNext, isLoaded }) => {
   const containerRef = useRef(null);
-  
-  // Decide what images to map through based on if the project has a gallery
   const galleryImages = project.gallery && project.gallery.length > 0 ? project.gallery : [project.img];
 
   useLayoutEffect(() => {
@@ -1353,17 +929,16 @@ const ProjectDetailView = ({ project, nextProject, onBack, onNext, isLoaded }) =
         { y: 0, opacity: 1, duration: 1.2, stagger: 0.15, ease: "power4.out", delay: 0.2 }
       );
       
-      // Multi-image gallery entry animation (triggers independently as they scroll into view)
       window.gsap.utils.toArray('.proj-img-anim').forEach((img, i) => {
         window.gsap.fromTo(img,
-          { scale: 0.95, opacity: 0, y: 100 },
+          { scale: 0.95, opacity: 0, y: 50 },
           { 
             scale: 1, opacity: 1, y: 0, 
-            duration: 1.5, 
-            ease: "power4.out",
+            duration: 1.2, 
+            ease: "power3.out",
             scrollTrigger: {
               trigger: img,
-              start: "top 85%",
+              start: "top 90%",
             }
           }
         );
@@ -1376,96 +951,88 @@ const ProjectDetailView = ({ project, nextProject, onBack, onNext, isLoaded }) =
   if (!project) return null;
 
   return (
-    <div ref={containerRef} className="w-full text-white min-h-screen flex flex-col relative">
+    <div ref={containerRef} className="w-full text-[#0b0b0b] min-h-screen flex flex-col relative">
       
-      {/* Sticky Detail Header Layer (Z-40: Stays fixed, Tools slide UNDER it) */}
-      <div className="sticky top-0 z-[40] bg-[#111111]/95 backdrop-blur-xl pt-12 md:pt-16 pb-6 border-b border-white/20 -mx-8 px-8 md:-mx-16 md:px-16 lg:-mx-24 lg:px-24">
-        <div className="flex flex-col gap-6 md:gap-8 max-w-6xl mx-auto w-full">
+      <div className="sticky top-0 z-[40] bg-white/95 backdrop-blur-xl pt-6 md:pt-16 pb-4 md:pb-6 border-b border-black/20 -mx-6 px-6 md:-mx-16 md:px-16 lg:-mx-24 lg:px-24">
+        <div className="flex flex-col gap-4 md:gap-8 max-w-6xl mx-auto w-full">
           <div className="proj-detail-anim">
             <button 
               onClick={onBack}
-              className="flex items-center gap-2 text-sm font-light tracking-widest uppercase opacity-60 hover:opacity-100 hover:text-[#E8383D] transition-all duration-300 w-max project-link"
+              className="flex items-center gap-2 text-xs md:text-sm font-light tracking-widest uppercase opacity-60 hover:opacity-100 hover:text-[#0b0b0b] transition-all duration-300 w-max project-link"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
               BACK
             </button>
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 proj-detail-anim">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-thin tracking-wide font-['Zen_Old_Mincho',_serif] uppercase">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 md:gap-6 proj-detail-anim">
+            <h1 className="text-2xl md:text-5xl lg:text-6xl font-thin tracking-[-0.025em] uppercase">
               {project.title}
             </h1>
-            <div className="flex gap-6 font-light tracking-widest text-sm opacity-80 shrink-0">
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#E8383D] transition-colors duration-300 flex items-center gap-1 project-link">
-                GitHub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+            <div className="flex gap-6 font-light tracking-widest text-xs md:text-sm opacity-80 shrink-0">
+              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#0b0b0b] transition-colors duration-300 flex items-center gap-1 project-link">
+                GitHub <svg width="12" height="12" className="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
               </a>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Foreground Image Gallery Layer (Z-50: Glides OVER the sticky header) */}
-      <div className="relative z-[50] w-full flex flex-col items-center gap-16 md:gap-32 mt-12 mb-[20vh] md:mb-[30vh] lg:mb-[40vh] pointer-events-none">
+      <div className="relative z-[50] w-full flex flex-col items-center gap-8 md:gap-32 mt-8 md:mt-12 mb-[15vh] md:mb-[30vh] lg:mb-[40vh] pointer-events-none">
         {galleryImages.map((src, idx) => (
           <div 
             key={idx} 
-            className="proj-img-anim w-full max-w-4xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.8)] rounded-sm border border-white/10 pointer-events-auto will-change-transform" 
+            className="proj-img-anim w-full max-w-4xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.6)] md:shadow-[0_30px_60px_rgba(0,0,0,0.8)] rounded-sm border border-black/10 pointer-events-auto will-change-transform mobile-no-parallax" 
             data-speed="0.4"
           >
-            {/* Using h-auto so uncropped dashboard screenshots display perfectly */}
             <img src={src} alt={`${project.title} screenshot ${idx + 1}`} className="w-full h-auto object-cover" />
           </div>
         ))}
       </div>
 
-      {/* Background Content Layer (Z-30: Scrolls normally and ends naturally) */}
-      <div className="relative z-[30] w-full pt-8 md:pt-12 pb-32">
-        {/* Info Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 w-full proj-detail-anim">
+      <div className="relative z-[30] w-full pt-4 md:pt-12 pb-24 md:pb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 w-full proj-detail-anim">
           
-          {/* Left Column: Specs */}
-          <div className="lg:col-span-5 flex flex-col gap-12">
-            <div className="will-change-transform" data-speed="0.2">
-              <h3 className="text-xl md:text-2xl font-light tracking-widest uppercase mb-6 text-white/90">TOOLS</h3>
-              <div className="flex flex-wrap gap-3">
+          <div className="lg:col-span-5 flex flex-col gap-8 md:gap-12">
+            <div className="will-change-transform mobile-no-parallax" data-speed="0.2">
+              <h3 className="text-base md:text-2xl font-light tracking-widest uppercase mb-4 md:mb-6 text-[#0b0b0b]">TOOLS</h3>
+              <div className="flex flex-wrap gap-2 md:gap-3">
                 {project.tools.map((tool) => (
-                  <span key={tool} className="border border-white/20 rounded-full px-5 py-2 text-sm font-extralight text-white/80">
+                  <span key={tool} className="border border-black/20 rounded-full px-4 md:px-5 py-1.5 md:py-2 text-[10px] md:text-sm font-extralight text-[#0b0b0b]">
                     {tool}
                   </span>
                 ))}
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-8 will-change-transform" data-speed="0.4">
+            <div className="grid grid-cols-2 gap-6 md:gap-8 will-change-transform mobile-no-parallax" data-speed="0.4">
               <div>
-                <h3 className="text-xl md:text-2xl font-light tracking-widest uppercase mb-4 text-white/90">DURATION</h3>
-                <p className="font-extralight opacity-70 text-base md:text-lg">{project.duration}</p>
+                <h3 className="text-base md:text-2xl font-light tracking-widest uppercase mb-2 md:mb-4 text-[#0b0b0b]">DURATION</h3>
+                <p className="font-extralight opacity-70 text-sm md:text-lg">{project.duration}</p>
               </div>
               <div>
-                <h3 className="text-xl md:text-2xl font-light tracking-widest uppercase mb-4 text-white/90">ROLES</h3>
-                <p className="font-extralight opacity-70 text-base md:text-lg">{project.roles}</p>
+                <h3 className="text-base md:text-2xl font-light tracking-widest uppercase mb-2 md:mb-4 text-[#0b0b0b]">ROLES</h3>
+                <p className="font-extralight opacity-70 text-sm md:text-lg">{project.roles}</p>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Summary */}
-          <div className="lg:col-span-7 will-change-transform" data-speed="0.6">
-            <h3 className="text-xl md:text-2xl font-light tracking-widest uppercase mb-6 text-white/90">SUMMARY</h3>
-            <p className="text-base md:text-lg lg:text-xl font-extralight opacity-70 leading-relaxed">
+          <div className="lg:col-span-7 will-change-transform mobile-no-parallax" data-speed="0.6">
+            <h3 className="text-base md:text-2xl font-light tracking-widest uppercase mb-4 md:mb-6 text-[#0b0b0b]">SUMMARY</h3>
+            <p className="text-sm md:text-lg lg:text-xl font-extralight opacity-70 leading-relaxed">
               {project.summary}
             </p>
           </div>
         </div>
 
-        {/* Next Project Footer */}
         {nextProject && (
-          <div className="flex justify-end mt-24 md:mt-32 proj-detail-anim will-change-transform" data-speed="0.8">
+          <div className="flex justify-end mt-16 md:mt-32 proj-detail-anim will-change-transform mobile-no-parallax" data-speed="0.8">
             <button 
               onClick={() => onNext(nextProject.id)}
-              className="group flex items-center gap-4 text-2xl md:text-3xl lg:text-4xl font-thin tracking-widest uppercase hover:text-[#E8383D] transition-colors duration-500 project-link"
+              className="group flex items-center gap-2 md:gap-4 text-lg md:text-3xl lg:text-4xl font-thin tracking-widest uppercase hover:text-[#0b0b0b] transition-colors duration-500 project-link"
             >
               {nextProject.title}
-              <svg className="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-2 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              <svg className="w-5 h-5 md:w-8 md:h-8 md:group-hover:translate-x-2 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </button>
           </div>
         )}
@@ -1479,85 +1046,300 @@ const ProjectDetailView = ({ project, nextProject, onBack, onNext, isLoaded }) =
 export default function App() {
   const mainRef = useRef(null);
   const loaderRef = useRef(null);
-  const counterRef = useRef(null);
-  const loaderLineRef = useRef(null);
+  const introNameRef = useRef(null);
   const transitionCurtainRef = useRef(null);
-  const inkCurtainRef = useRef(null); 
+  const inkCurtainRef = useRef(null);
+  const detailCoverRef = useRef(null);
+  const detailFlyingTextRef = useRef(null);
+  const infoTitleRef = useRef(null);
+  const contactTitleRef = useRef(null);
+  const worksTitleRef = useRef(null);
+  const detailSourceRef = useRef(null);
+  const detailArrivalRef = useRef(false);
+  const returningFromDetailRef = useRef(false);
+  const currentViewRef = useRef('home');
+  const detailSwapTimerRef = useRef(null);
   
   const [scriptsLoaded, setScriptsLoaded] = useState(false);
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'works' | 'project'
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [isPageReady, setIsPageReady] = useState(false);
+  const [currentView, setCurrentView] = useState(() => getPortfolioViewFromPath(
+    typeof window === 'undefined' ? '/' : window.location.pathname,
+  ));
+  const [selectedProjectId, setSelectedProjectId] = useState(() => (
+    typeof window === 'undefined' ? null : getProjectIdFromPath(window.location.pathname)
+  ));
   const [isNavigating, setIsNavigating] = useState(false);
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const lenisRef = useRef(null);
+  const projectTriggerRef = useRef(null);
+
+  currentViewRef.current = currentView;
 
   useEffect(() => {
-    const loadScripts = async () => {
-      const loadScript = (src) => new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = src;
-        script.onload = resolve;
-        document.head.appendChild(script);
-      });
+    const initialView = getPortfolioViewFromPath(window.location.pathname);
+    window.history.replaceState({
+      ...window.history.state,
+      portfolioView: initialView,
+      enteredFromHome: false,
+    }, '', window.location.href);
 
-      await Promise.all([
-        loadScript('https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js'),
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js')
-      ]);
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js');
-
-      lenisRef.current = new window.Lenis({
-        duration: 1.8, 
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
-        direction: 'vertical',
-        gestureDirection: 'vertical',
-        smooth: true,
-        mouseMultiplier: 0.7, 
-        smoothTouch: false,
-        touchMultiplier: 2,
-        infinite: false,
-      });
-
-      lenisRef.current.stop();
-
-      function raf(time) {
-        if(lenisRef.current) lenisRef.current.raf(time);
-        requestAnimationFrame(raf);
+    const handlePopState = () => {
+      const nextView = getPortfolioViewFromPath(window.location.pathname);
+      if (['info', 'contact', 'works'].includes(currentViewRef.current) && nextView === 'home') {
+        returningFromDetailRef.current = true;
+        window.gsap?.set(detailCoverRef.current, { opacity: 1, pointerEvents: 'auto' });
       }
-      requestAnimationFrame(raf);
+      setSelectedProjectId(getProjectIdFromPath(window.location.pathname));
+      setCurrentView(nextView);
+      window.scrollTo(0, 0);
+    };
 
-      window.gsap.registerPlugin(window.ScrollTrigger);
-      setScriptsLoaded(true);
-      
-      lenisRef.current.on('scroll', (e) => {
-        if (window.gsap) {
-          window.gsap.set('.scroll-progress-indicator', { scaleY: e.progress || 0 });
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => () => {
+    if (detailSwapTimerRef.current !== null) window.clearTimeout(detailSwapTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    let disposed = false;
+    let scrollLoop = null;
+    let lenis = null;
+    let onScroll = null;
+
+    const releaseWithoutAnimations = () => {
+      if (disposed) return;
+      setIsPageReady(true);
+      if (loaderRef.current) loaderRef.current.style.display = 'none';
+    };
+
+    const runtimeFallbackTimer = window.setTimeout(releaseWithoutAnimations, 5000);
+
+    const loadScripts = async () => {
+      try {
+        await Promise.all([
+          loadScriptOnce('https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.min.js'),
+          loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js')
+        ]);
+        await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js');
+        await document.fonts?.ready;
+        if (disposed) return;
+
+        window.clearTimeout(runtimeFallbackTimer);
+        window.gsap.registerPlugin(window.ScrollTrigger);
+        const supportsSmoothScroll = window.innerWidth >= 1025
+          && !('ontouchstart' in window)
+          && navigator.maxTouchPoints === 0;
+
+        if (supportsSmoothScroll) {
+          lenis = new window.Lenis(getSmoothScrollOptions());
+          lenisRef.current = lenis;
+          window.portfolioLenis = lenis;
+          lenis.stop();
+          scrollLoop = createAnimationFrameLoop((time) => lenis.raf(time));
+          scrollLoop.start();
         }
-      });
+        setScriptsLoaded(true);
+
+        onScroll = (event) => {
+          window.ScrollTrigger.update();
+          window.gsap.set('.scroll-progress-indicator', { scaleY: event.progress || 0 });
+        };
+        lenis?.on('scroll', onScroll);
+      } catch {
+        window.clearTimeout(runtimeFallbackTimer);
+        releaseWithoutAnimations();
+      }
     };
     loadScripts();
 
     return () => {
-      if (lenisRef.current) lenisRef.current.destroy();
-      if (window.ScrollTrigger) window.ScrollTrigger.getAll().forEach(t => t.kill());
+      disposed = true;
+      window.clearTimeout(runtimeFallbackTimer);
+      scrollLoop?.stop();
+      if (onScroll) lenis?.off?.('scroll', onScroll);
+      lenis?.destroy();
+      if (lenisRef.current === lenis) lenisRef.current = null;
+      if (window.portfolioLenis === lenis) delete window.portfolioLenis;
     };
   }, []);
 
   useEffect(() => {
     if (!scriptsLoaded) return;
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const byRevealOrder = (first, second) => (
+      Number(first.dataset.introOrder) - Number(second.dataset.introOrder)
+    );
+    const givenLetters = Array.from(
+      introNameRef.current.querySelectorAll('.name-intro__letter--given'),
+    ).sort(byRevealOrder);
+    const surnameLetters = Array.from(
+      introNameRef.current.querySelectorAll('.name-intro__letter--surname'),
+    ).sort(byRevealOrder);
+    let pageReleased = false;
+
+    const releasePage = () => {
+      if (pageReleased) return;
+      pageReleased = true;
+      setIsPageReady(true);
+    };
+
     const masterTl = window.gsap.timeline({
       onComplete: () => {
-        if(loaderRef.current) loaderRef.current.style.display = 'none';
-        if(lenisRef.current) lenisRef.current.start();
+        releasePage();
+        if (loaderRef.current) loaderRef.current.style.display = 'none';
+        if (lenisRef.current) lenisRef.current.start();
       }
     });
 
-    masterTl.to(counterRef.current, { innerHTML: 100, duration: 2.5, snap: { innerHTML: 1 }, ease: "power2.inOut" })
-    .to(loaderLineRef.current, { scaleY: 1, duration: 0.8, ease: "power4.inOut" }, "-=1.0")
-    .to(loaderRef.current, { yPercent: 100, duration: 1.6, ease: "power4.inOut" });
+    if (reduceMotion) {
+      masterTl
+        .set(introNameRef.current, { opacity: 1, scale: 1 })
+        .set([...givenLetters, ...surnameLetters], {
+          opacity: 1,
+          yPercent: 0,
+          rotate: 0,
+          scale: 1,
+          filter: 'blur(0px)',
+        })
+        .to(introNameRef.current, { opacity: 0, duration: 0.2, delay: 0.3, ease: 'none' })
+        .call(releasePage)
+        .to(loaderRef.current, { autoAlpha: 0, duration: 0.2, ease: 'none' });
+    } else {
+      masterTl
+        .set(introNameRef.current, { opacity: 1, scale: 0.96 }, 0.1)
+        .fromTo(
+          givenLetters,
+          { opacity: 0, yPercent: 115, rotate: 7, scale: 0.82, filter: 'blur(8px)' },
+          {
+            opacity: 1,
+            yPercent: 0,
+            rotate: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.72,
+            stagger: 0.075,
+            ease: 'expo.out',
+          },
+          0.18,
+        )
+        .fromTo(
+          surnameLetters,
+          { opacity: 0, yPercent: 115, rotate: -7, scale: 0.82, filter: 'blur(8px)' },
+          {
+            opacity: 1,
+            yPercent: 0,
+            rotate: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.72,
+            stagger: 0.075,
+            ease: 'expo.out',
+          },
+          0.18,
+        )
+        .to(introNameRef.current, { scale: 1, duration: 0.9, ease: 'power3.out' }, 0.18)
+        .to(
+          introNameRef.current,
+          { opacity: 0, scale: 1.2, filter: 'blur(4px)', duration: 0.72, ease: 'power3.in' },
+          1.72,
+        )
+        .call(releasePage, null, 1.9)
+        .to(loaderRef.current, { yPercent: -100, duration: 1.05, ease: 'expo.inOut' }, 1.9);
+    }
 
+    return () => masterTl.kill();
   }, [scriptsLoaded]);
+
+  useLayoutEffect(() => {
+    if (!scriptsLoaded || !window.gsap) return undefined;
+
+    const gsap = window.gsap;
+    const cover = detailCoverRef.current;
+    const flyingText = detailFlyingTextRef.current;
+
+    if (['info', 'contact', 'works'].includes(currentView)) {
+      const title = currentView === 'contact'
+        ? contactTitleRef.current
+        : currentView === 'works'
+          ? worksTitleRef.current
+          : infoTitleRef.current;
+      const main = document.querySelector('[data-detail-main]');
+      const back = document.querySelector('[data-detail-back]');
+      const footer = document.querySelector('[data-detail-footer]');
+      const arrivedFromNavigation = detailArrivalRef.current;
+      detailArrivalRef.current = false;
+
+      gsap.killTweensOf([cover, flyingText, title, main, back, footer]);
+
+      if (!arrivedFromNavigation) {
+        gsap.set(cover, { opacity: 0, pointerEvents: 'none' });
+        gsap.set(flyingText, { opacity: 0 });
+        gsap.set([title, main, back, footer], { opacity: 1 });
+        setIsNavigating(false);
+        window.requestAnimationFrame(() => title?.focus({ preventScroll: true }));
+        return undefined;
+      }
+
+      gsap.set(cover, { opacity: 1, pointerEvents: 'auto' });
+      gsap.set(title, { opacity: 1 });
+      gsap.set([main, back, footer], { opacity: 0 });
+
+      const coverDelay = 0.1;
+      const coverDuration = 0.9;
+      const releaseTime = getDetailArrivalReleaseTime({ coverDelay, coverDuration });
+      const releaseInteraction = () => {
+        gsap.set(cover, { pointerEvents: 'none' });
+        resumeSmoothScroll(lenisRef.current);
+        setIsNavigating(false);
+      };
+
+      const timeline = gsap.timeline({
+        onComplete: () => {
+          title?.focus({ preventScroll: true });
+        },
+      });
+      const labelHandoff = getFlyingLabelHandoffTiming();
+
+      timeline
+        .to(flyingText, {
+          opacity: 0,
+          duration: labelHandoff.duration,
+          ease: 'power2.out',
+        }, labelHandoff.delay)
+        .to(cover, { opacity: 0, duration: coverDuration, ease: 'power2.out' }, coverDelay)
+        .call(releaseInteraction, null, releaseTime)
+        .to(main, { opacity: 1, duration: 1.1, ease: 'power2.out' }, 0.5)
+        .to(back, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.7)
+        .to(footer, { opacity: 1, duration: 0.7, ease: 'power2.out' }, 0.8);
+
+      return () => timeline.kill();
+    }
+
+    if (returningFromDetailRef.current) {
+      returningFromDetailRef.current = false;
+      gsap.killTweensOf([cover, flyingText]);
+      gsap.set(flyingText, { opacity: 0 });
+      const tween = gsap.to(cover, {
+        opacity: 0,
+        duration: 0.65,
+        ease: 'power2.out',
+        onComplete: () => {
+          gsap.set(cover, { pointerEvents: 'none' });
+          setIsNavigating(false);
+          if (detailSourceRef.current) {
+            detailSourceRef.current.style.visibility = '';
+            detailSourceRef.current = null;
+          }
+          if (lenisRef.current) lenisRef.current.start();
+        },
+      });
+      return () => tween.kill();
+    }
+
+    return undefined;
+  }, [currentView, scriptsLoaded]);
 
   const handleNavigation = (view, projectId = null) => {
     if ((view === currentView && projectId === selectedProjectId) || isNavigating || !window.gsap) return;
@@ -1576,119 +1358,366 @@ export default function App() {
       .call(() => {
         setCurrentView(view);
         setSelectedProjectId(projectId);
-        lenisRef.current.scrollTo(0, { immediate: true });
+        if (lenisRef.current) lenisRef.current.scrollTo(0, { immediate: true });
+        else window.scrollTo(0, 0);
       })
       .to(inkCurtainRef.current, { scaleY: 0, duration: 0.8, ease: "expo.inOut", transformOrigin: "bottom" }, "+=0.1");
   };
 
-  // Helper variables for Project Detail View
+  const handleDetailNavigation = (view, sourceElement) => {
+    const navigationMode = getDetailNavigationMode({
+      hasSourceElement: Boolean(sourceElement),
+      isNavigating,
+      hasAnimationRuntime: Boolean(window.gsap),
+    });
+
+    if (navigationMode === 'blocked') return;
+
+    if (navigationMode === 'immediate') {
+      if (loaderRef.current) loaderRef.current.style.display = 'none';
+      setIsPageReady(true);
+      window.history.pushState({ portfolioView: view, enteredFromHome: true }, '', `/${view}/`);
+      setCurrentView(view);
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    const gsap = window.gsap;
+    const sourceRect = sourceElement.getBoundingClientRect();
+    const sourceStyle = window.getComputedStyle(sourceElement);
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const plan = createInfoTransitionPlan({
+      destinationView: view,
+      sourceRect,
+      sourceFontSize: Number.parseFloat(sourceStyle.fontSize),
+      viewportWidth: window.innerWidth,
+      prefersReducedMotion,
+    });
+    const swapDelay = getInfoTransitionSwapDelayMs(plan.timing);
+
+    setIsNavigating(true);
+    detailArrivalRef.current = true;
+    detailSourceRef.current = sourceElement;
+    sourceElement.style.visibility = 'hidden';
+    lenisRef.current?.stop();
+
+    detailFlyingTextRef.current.textContent = view === 'contact'
+      ? 'Contact'
+      : view === 'works'
+        ? 'Works'
+        : 'Info';
+    gsap.killTweensOf([detailCoverRef.current, detailFlyingTextRef.current]);
+    gsap.set(detailCoverRef.current, { opacity: 0, pointerEvents: 'auto' });
+    gsap.set(detailFlyingTextRef.current, {
+      left: plan.start.left,
+      top: plan.start.top,
+      fontSize: plan.start.fontSize,
+      fontWeight: sourceStyle.fontWeight,
+      lineHeight: sourceStyle.lineHeight,
+      letterSpacing: sourceStyle.letterSpacing,
+      opacity: 1,
+      x: 0,
+      y: 0,
+    });
+
+    gsap.timeline()
+      .to(detailCoverRef.current, {
+        opacity: 1,
+        duration: plan.timing.coverDuration,
+        ease: 'power2.inOut',
+      }, 0)
+      .to(detailFlyingTextRef.current, {
+        left: plan.end.left,
+        top: plan.end.top,
+        fontSize: plan.end.fontSize,
+        fontWeight: 400,
+        lineHeight: plan.end.lineHeight,
+        letterSpacing: plan.end.letterSpacing,
+        duration: plan.timing.labelDuration,
+        ease: 'power3.inOut',
+      }, plan.timing.labelDelay);
+
+    detailSwapTimerRef.current = window.setTimeout(() => {
+      detailSwapTimerRef.current = null;
+      window.history.pushState({ portfolioView: view, enteredFromHome: true }, '', `/${view}/`);
+      setCurrentView(view);
+      window.scrollTo(0, 0);
+    }, swapDelay);
+  };
+
+  const handleDetailBack = () => {
+    if (isNavigating || !window.gsap) return;
+
+    const gsap = window.gsap;
+    const title = currentView === 'contact'
+      ? contactTitleRef.current
+      : currentView === 'works'
+        ? worksTitleRef.current
+        : infoTitleRef.current;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setIsNavigating(true);
+
+    const timeline = gsap.timeline({
+      onComplete: () => {
+        returningFromDetailRef.current = true;
+        if (window.history.state?.enteredFromHome) {
+          window.history.back();
+          return;
+        }
+        window.history.replaceState({ portfolioView: 'home', enteredFromHome: false }, '', '/');
+        setCurrentView('home');
+      },
+    });
+
+    timeline
+      .to(title, {
+        opacity: 0,
+        duration: prefersReducedMotion ? 0 : 0.4,
+        ease: 'power2.inOut',
+      }, 0)
+      .to(detailCoverRef.current, {
+        opacity: 1,
+        duration: prefersReducedMotion ? 0 : 0.5,
+        ease: 'power2.inOut',
+        onStart: () => gsap.set(detailCoverRef.current, { pointerEvents: 'auto' }),
+      }, prefersReducedMotion ? 0 : 0.1);
+  };
+
+  const handleSectionNavigation = (sectionId, sourceElement) => {
+    if (['info', 'contact', 'works'].includes(sectionId)) {
+      handleDetailNavigation(sectionId, sourceElement);
+      return;
+    }
+
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+
+    const offset = sectionId === 'contact' ? -120 : -24;
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(section, { offset, duration: 1.25 });
+      return;
+    }
+
+    const top = section.getBoundingClientRect().top + window.scrollY + offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
+  const handleProjectOpen = (id) => {
+    projectTriggerRef.current = document.activeElement;
+    setSelectedProjectId(id);
+  };
+
+  const handleCaseStudyNavigation = (view, id, path, historyMethod = 'pushState') => {
+    if (isNavigating || !window.gsap) return;
+
+    const gsap = window.gsap;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setIsNavigating(true);
+    lenisRef.current?.stop();
+    gsap.killTweensOf(inkCurtainRef.current);
+    gsap.set(inkCurtainRef.current, {
+      backgroundColor: '#f5f5f2',
+      opacity: 1,
+      scaleY: 0,
+      transformOrigin: 'bottom',
+      pointerEvents: 'auto',
+    });
+
+    gsap.timeline({
+      onComplete: () => {
+        gsap.set(inkCurtainRef.current, {
+          backgroundColor: '#070707',
+          opacity: 1,
+          scaleY: 0,
+          pointerEvents: 'none',
+        });
+        lenisRef.current?.start();
+        window.ScrollTrigger?.refresh();
+        setIsNavigating(false);
+      },
+    })
+      .to(inkCurtainRef.current, {
+        scaleY: 1,
+        duration: reducedMotion ? 0 : 1.15,
+        ease: 'expo.inOut',
+      })
+      .call(() => {
+        window.history[historyMethod]({ portfolioView: view, projectId: id }, '', path);
+        setSelectedProjectId(id);
+        setCurrentView(view);
+        restoreCaseStudyScroll(lenisRef.current, () => window.scrollTo(0, 0));
+      })
+      .to(inkCurtainRef.current, {
+        opacity: 0,
+        duration: reducedMotion ? 0 : 0.55,
+        ease: 'power2.out',
+      });
+  };
+
+  const handleWorkProjectOpen = (id) => {
+    handleCaseStudyNavigation('project', id, getProjectPath(id));
+  };
+
+  const handleCaseStudyBack = () => {
+    handleCaseStudyNavigation('works', null, '/works/', 'replaceState');
+  };
+
+  const handleNextCaseStudy = (id) => {
+    handleCaseStudyNavigation('project', id, getProjectPath(id), 'replaceState');
+  };
+
+  const handleProjectClose = () => {
+    setSelectedProjectId(null);
+    window.requestAnimationFrame(() => projectTriggerRef.current?.focus?.({ preventScroll: true }));
+  };
+
   const selectedProject = selectedProjectId ? PROJECTS_DATA.find(p => p.id === selectedProjectId) : null;
   const selectedProjectIndex = selectedProjectId ? PROJECTS_DATA.findIndex(p => p.id === selectedProjectId) : -1;
   const nextProject = selectedProjectIndex >= 0 && selectedProjectIndex < PROJECTS_DATA.length - 1 ? PROJECTS_DATA[selectedProjectIndex + 1] : null;
 
   return (
-    <div ref={mainRef} className="min-h-screen w-full relative overflow-x-clip cursor-none selection:bg-[#E8383D] selection:text-white bg-[#111111] text-[#e0e0e0] font-['Montserrat',_sans-serif]">
-      <CustomCursor />
-      <TraceTrailBackground />
-      <ComingSoonOverlay isOpen={isGalleryOpen} onClose={() => setIsGalleryOpen(false)} />
+    <div ref={mainRef} className="min-h-screen w-full relative overflow-x-clip cursor-auto selection:bg-[#0b0b0b] selection:text-[#f5f5f2] bg-[#f5f5f2] text-[#0b0b0b]">
+      {/* Grain noise overlay — premium tactile depth */}
+      <div className="grain-overlay" aria-hidden="true" />
 
-      {/* --- Fullscreen Page Transition Curtain --- */}
       <div ref={inkCurtainRef} className="fixed inset-0 bg-[#070707] z-[75] scale-y-0 origin-top pointer-events-none"></div>
 
-      {/* --- Global Scroll Progress Indicator --- */}
-      <div className={`fixed right-6 md:right-10 top-1/4 h-1/2 w-[1px] bg-white/10 z-[60] mix-blend-difference hidden md:block transition-opacity duration-500 ${currentView === 'project' ? 'opacity-0' : 'opacity-100'}`}>
-        <div className="scroll-progress-indicator w-full bg-[#E8383D] origin-top scale-y-0 h-full shadow-[0_0_10px_rgba(232,56,61,0.8)]"></div>
+      <div
+        id="detail-transition-cover"
+        ref={detailCoverRef}
+        className="fixed inset-0 z-[10010] bg-[#f5f5f2] opacity-0 pointer-events-none"
+        aria-hidden="true"
+      />
+      <div
+        id="detail-transition-label"
+        ref={detailFlyingTextRef}
+        className="fixed z-[10011] whitespace-nowrap text-[#0b0b0b] opacity-0 pointer-events-none"
+        style={{
+          fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+          lineHeight: 1.2,
+          willChange: 'left, top, font-size',
+        }}
+        aria-hidden="true"
+      >
+        Info
       </div>
 
-      {/* --- Japanese Cinematic Loader Overlay --- */}
-      <div ref={loaderRef} className="fixed inset-0 z-[100] bg-[#0a0a0a] flex items-center justify-center overflow-hidden pointer-events-auto">
-        <div className="absolute inset-0 flex items-center justify-center opacity-5">
-          <div className="w-[40vw] h-[40vw] border border-[#E8383D] rounded-full animate-ping" style={{animationDuration: '4s'}}></div>
-        </div>
-        <div className="relative z-10 flex gap-8 md:gap-12 items-center">
-          <div className="text-[#E8383D] text-6xl md:text-8xl font-thin tracking-tighter w-24 md:w-32 text-right">
-            <span ref={counterRef}>0</span><span className="text-white/50 text-4xl md:text-6xl">%</span>
-          </div>
-          <div ref={loaderLineRef} className="w-[1px] h-32 md:h-48 bg-[#E8383D] scale-y-0 origin-top"></div>
-          <div className="flex gap-4 font-['Zen_Old_Mincho',_serif] text-lg md:text-2xl tracking-[0.5em] text-white opacity-80" style={{ writingMode: 'vertical-rl' }}>
-            <span>創造の領域へ</span>
-            <span className="text-[#E8383D] tracking-[0.3em] opacity-80">ケント・カワゾエ</span>
-          </div>
+      <ScrollProgressRail isLoaded={isPageReady} isVisible={currentView === 'home'} />
+
+      <div
+        ref={loaderRef}
+        className="name-intro pointer-events-none fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
+      >
+        <div ref={introNameRef} className="name-intro__name" aria-label="Jovan Chandra">
+          <span className="name-intro__given" aria-hidden="true">
+            {'Jovan'.split('').map((letter, index) => (
+              <span
+                key={`${letter}-${index}`}
+                className="name-intro__letter name-intro__letter--given"
+                data-intro-order={4 - index}
+              >
+                {letter}
+              </span>
+            ))}
+          </span>
+          <span className="name-intro__surname" aria-hidden="true">
+            {'Chandra'.split('').map((letter, index) => (
+              <span
+                key={`${letter}-${index}`}
+                className="name-intro__letter name-intro__letter--surname"
+                data-intro-order={index}
+              >
+                {letter}
+              </span>
+            ))}
+          </span>
         </div>
       </div>
 
-      {/* --- Sidebar Navigation (Visible on Home) --- */}
+      <FloatingHomeNav
+        currentView={currentView}
+        onSection={handleSectionNavigation}
+        isLoaded={isPageReady}
+        isNavigating={isNavigating}
+      />
+
+      {currentView === 'info' && (
+        <InfoView ref={infoTitleRef} onBack={handleDetailBack} />
+      )}
+
+      {currentView === 'contact' && (
+        <ContactView ref={contactTitleRef} onBack={handleDetailBack} />
+      )}
+
+      {currentView === 'works' && (
+        <WorksArchiveView
+          ref={worksTitleRef}
+          isLoaded={isPageReady}
+          projects={PROJECTS_DATA}
+          onBack={handleDetailBack}
+          onProjectClick={handleWorkProjectOpen}
+        />
+      )}
+
+      {/* --- Works Navigation: Top Header --- */}
       <nav 
-        className={`fixed left-0 top-0 h-full w-24 md:w-48 flex flex-col justify-between p-8 md:p-12 z-[60] bg-[#111111]/10 text-white transition-all duration-[1000ms] progressive-blur-left
-        ${currentView === 'home' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed left-0 top-0 w-full h-16 md:h-24 flex justify-between items-center px-6 md:px-16 lg:px-24 z-[60] bg-white/90 md:bg-white/80 backdrop-blur-xl border-b border-black/10 text-[#0b0b0b] transition-all duration-[1000ms]
+        ${currentView === 'gallery' ? 'opacity-100 pointer-events-auto translate-y-0' : 'opacity-0 pointer-events-none -translate-y-16'}`}
       >
-        <div className="flex flex-col gap-6 text-sm tracking-widest uppercase">
+        <div className="flex gap-6 md:gap-12 text-[10px] md:text-sm tracking-widest uppercase w-full md:w-auto justify-around md:justify-start">
           <button onClick={() => handleNavigation('home')} className="relative group w-max text-left project-link">
             <span className={`transition-opacity font-light ${currentView === 'home' ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>Home</span>
-            <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 ${currentView === 'home' ? 'w-full bg-[#E8383D]' : 'w-0 group-hover:w-full bg-white'}`}></span>
+            <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 hidden md:block ${currentView === 'home' ? 'w-full bg-[#0b0b0b]' : 'w-0 group-hover:w-full bg-[#0b0b0b]'}`}></span>
           </button>
           <button onClick={() => handleNavigation('works')} className="relative group w-max text-left project-link">
-            <span className={`transition-opacity font-light ${currentView === 'works' ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>Works</span>
-            <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 ${currentView === 'works' ? 'w-full bg-[#E8383D]' : 'w-0 group-hover:w-full bg-white'}`}></span>
+            <span className={`transition-opacity font-light ${currentView === 'works' ? 'opacity-100 text-[#0b0b0b]' : 'opacity-50 group-hover:opacity-100'}`}>Works</span>
+            <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 hidden md:block ${currentView === 'works' ? 'w-full bg-[#0b0b0b]' : 'w-0 group-hover:w-full bg-[#0b0b0b]'}`}></span>
           </button>
-          <button onClick={() => setIsGalleryOpen(true)} className="relative group w-max text-left opacity-50 hover:opacity-100 transition-opacity duration-500 project-link">
-            <span className="font-light">Gallery</span>
-            <span className="absolute -bottom-2 left-0 w-0 group-hover:w-full h-[1px] bg-white transition-all duration-500"></span>
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-8 items-start">
-          <a href="https://www.linkedin.com/in/jovan-richaldy/" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:scale-125 hover:text-[#E8383D] hover:drop-shadow-[0_0_10px_rgba(232,56,61,0.8)] transition-all duration-500 project-link"><LinkedinIcon size={20} strokeWidth={1.5} /></a>
-          <a href="https://www.instagram.com/jovanrichaldy/?hl=en" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:scale-125 hover:text-[#E8383D] hover:drop-shadow-[0_0_10px_rgba(232,56,61,0.8)] transition-all duration-500 project-link"><InstagramIcon size={20} strokeWidth={1.5} /></a>
-          <a href="https://github.com/urboiflex" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:scale-125 hover:text-[#E8383D] hover:drop-shadow-[0_0_10px_rgba(232,56,61,0.8)] transition-all duration-500 project-link"><GithubIcon size={20} strokeWidth={1.5} /></a>
-          <a href="mailto:jovan.rc1212@gmail.com" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:scale-125 hover:text-[#E8383D] hover:drop-shadow-[0_0_10px_rgba(232,56,61,0.8)] transition-all duration-500 project-link"><MailIcon size={20} strokeWidth={1.5} /></a>
-        </div>
-
-        <div className="text-xs opacity-40 whitespace-nowrap tracking-widest uppercase mt-4 font-light">
-          &copy; Jovan Chandra
-        </div>
-      </nav>
-
-      {/* --- Top Header Navigation (Visible on Works ONLY - hides on Project Detail) --- */}
-      <nav 
-        className={`fixed left-0 top-0 w-full h-20 md:h-24 flex justify-between items-center px-8 md:px-16 lg:px-24 z-[60] bg-[#111111]/10 text-white transition-all duration-[1000ms] progressive-blur-top
-        ${currentView === 'works' ? 'opacity-100 pointer-events-auto translate-y-0' : 'opacity-0 pointer-events-none -translate-y-16'}`}
-      >
-        <div className="flex gap-8 md:gap-12 text-sm tracking-widest uppercase">
-          <button onClick={() => handleNavigation('home')} className="relative group w-max text-left project-link">
-            <span className={`transition-opacity font-light ${currentView === 'home' ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>Home</span>
-            <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 ${currentView === 'home' ? 'w-full bg-[#E8383D]' : 'w-0 group-hover:w-full bg-white'}`}></span>
-          </button>
-          <button onClick={() => handleNavigation('works')} className="relative group w-max text-left project-link">
-            <span className={`transition-opacity font-light ${currentView === 'works' ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}>Works</span>
-            <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 ${currentView === 'works' ? 'w-full bg-[#E8383D]' : 'w-0 group-hover:w-full bg-white'}`}></span>
-          </button>
-          <button onClick={() => setIsGalleryOpen(true)} className="relative group w-max text-left opacity-50 hover:opacity-100 transition-opacity duration-500 project-link">
-            <span className="font-light">Gallery</span>
-            <span className="absolute -bottom-2 left-0 w-0 group-hover:w-full h-[1px] bg-white transition-all duration-500"></span>
+          <button onClick={() => handleNavigation('gallery')} className="relative group w-max text-left project-link">
+            <span className={`transition-opacity font-light ${currentView === 'gallery' ? 'opacity-100 text-[#0b0b0b]' : 'opacity-50 group-hover:opacity-100'}`}>Gallery</span>
+            <span className={`absolute -bottom-2 left-0 h-[1px] transform origin-left transition-all duration-500 hidden md:block ${currentView === 'gallery' ? 'w-full bg-[#0b0b0b]' : 'w-0 group-hover:w-full bg-[#0b0b0b]'}`}></span>
           </button>
         </div>
 
-        <div className="flex gap-6 items-center">
-          <a href="https://www.linkedin.com/in/jovan-richaldy/" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:-translate-y-1 hover:text-[#E8383D] hover:drop-shadow-[0_0_10px_rgba(232,56,61,0.8)] transition-all duration-500 project-link"><LinkedinIcon size={20} strokeWidth={1.5} /></a>
-          <a href="https://www.instagram.com/jovanrichaldy/?hl=en" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:-translate-y-1 hover:text-[#E8383D] hover:drop-shadow-[0_0_10px_rgba(232,56,61,0.8)] transition-all duration-500 project-link"><InstagramIcon size={20} strokeWidth={1.5} /></a>
-          <a href="https://github.com/urboiflex" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:-translate-y-1 hover:text-[#E8383D] hover:drop-shadow-[0_0_10px_rgba(232,56,61,0.8)] transition-all duration-500 project-link"><GithubIcon size={20} strokeWidth={1.5} /></a>
-          <a href="mailto:jovan.rc1212@gmail.com" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:-translate-y-1 hover:text-[#E8383D] hover:drop-shadow-[0_0_10px_rgba(232,56,61,0.8)] transition-all duration-500 project-link"><MailIcon size={20} strokeWidth={1.5} /></a>
+        <div className="hidden md:flex gap-6 items-center">
+          <a href="https://www.linkedin.com/in/jovan-richaldy/" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:-translate-y-1 hover:text-[#0b0b0b] hover:drop-shadow-[0_0_10px_rgba(11,11,11,0.22)] transition-all duration-500 project-link"><LinkedinIcon size={20} strokeWidth={1.5} /></a>
+          <a href="https://www.instagram.com/jovanrichaldy/?hl=en" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:-translate-y-1 hover:text-[#0b0b0b] hover:drop-shadow-[0_0_10px_rgba(11,11,11,0.22)] transition-all duration-500 project-link"><InstagramIcon size={20} strokeWidth={1.5} /></a>
+          <a href="https://github.com/urboiflex" target="_blank" rel="noopener noreferrer" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:-translate-y-1 hover:text-[#0b0b0b] hover:drop-shadow-[0_0_10px_rgba(11,11,11,0.22)] transition-all duration-500 project-link"><GithubIcon size={20} strokeWidth={1.5} /></a>
+          <a href="mailto:jovan.rc1212@gmail.com" className="relative p-2 -m-2 opacity-50 hover:opacity-100 hover:-translate-y-1 hover:text-[#0b0b0b] hover:drop-shadow-[0_0_10px_rgba(11,11,11,0.22)] transition-all duration-500 project-link"><MailIcon size={20} strokeWidth={1.5} /></a>
         </div>
       </nav>
 
       {/* --- Main Content Container --- */}
-      <main className={`relative z-50 transition-all duration-0 px-8 md:px-16 lg:px-24
-        ${currentView === 'home' ? 'ml-24 md:ml-48 pt-0 pb-32' : 'ml-0 pt-0'}
-        ${currentView === 'works' ? 'pb-32' : ''}
+      <main className={`relative z-50 transition-all duration-0
+        ${currentView === 'project' ? 'px-0' : 'px-6 md:px-16 lg:px-24'}
+        ${currentView === 'home' ? 'pt-0 pb-28 md:pb-32' : 'ml-0 pt-0'}
+        ${currentView === 'works' ? 'pb-24 md:pb-32' : ''}
+        ${currentView === 'gallery' ? 'pb-24 md:pb-32' : ''}
         ${currentView === 'project' ? 'pb-0' : ''}
       `}>
-        <div ref={transitionCurtainRef} className="w-full max-w-6xl mx-auto">
-          {currentView === 'home' && <HomeView isLoaded={scriptsLoaded} />}
-          {currentView === 'works' && <WorksView isLoaded={scriptsLoaded} onProjectClick={(id) => handleNavigation('project', id)} />}
+        <div ref={transitionCurtainRef} className={currentView === 'project' ? 'w-full' : 'w-full max-w-6xl mx-auto'}>
+          {currentView === 'home' && (
+            <HomeView
+              isLoaded={isPageReady}
+              onProjectClick={handleProjectOpen}
+            />
+          )}
+          {currentView === 'legacy-works' && <WorksView isLoaded={isPageReady} onProjectClick={handleProjectOpen} />}
+          {currentView === 'gallery' && <GalleryView isLoaded={isPageReady} />}
           {currentView === 'project' && selectedProject && (
-            <ProjectDetailView 
-              isLoaded={scriptsLoaded}
+            <ProjectCaseStudyView
+              isLoaded={isPageReady}
+              project={selectedProject}
+              nextProject={nextProject}
+              currentProjectIndex={selectedProjectIndex}
+              projectCount={PROJECTS_DATA.length}
+              onBack={handleCaseStudyBack}
+              onNext={handleNextCaseStudy}
+            />
+          )}
+          {currentView === 'legacy-project' && selectedProject && (
+            <ProjectDetailView
+              isLoaded={isPageReady}
               project={selectedProject}
               nextProject={nextProject}
               onBack={() => handleNavigation('works')}
@@ -1698,30 +1727,17 @@ export default function App() {
         </div>
       </main>
 
-      <style dangerouslySetInnerHTML={{__html: `
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500&family=Zen+Old+Mincho:wght@400;500;700&display=swap');
-        
-        * {
-          cursor: none !important;
-        }
+      {selectedProject && currentView !== 'project' && (
+        <ProjectShowcaseModal
+          project={selectedProject}
+          projects={PROJECTS_DATA}
+          onClose={handleProjectClose}
+          onSelectProject={setSelectedProjectId}
+          scrollController={lenisRef.current}
+        />
+      )}
 
-        .progressive-blur-left {
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-          mask-image: linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-        }
-        
-        .progressive-blur-top {
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-          mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px;}
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(232,56,61,0.5); border-radius: 10px; }
+      <style dangerouslySetInnerHTML={{__html: `
         
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(40px); }
@@ -1732,8 +1748,31 @@ export default function App() {
           from { opacity: 0; transform: scale(0.9); }
           to { opacity: 1; transform: scale(1); }
         }
+        
         .animate-custom-fade {
           animation: customFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        .line-clamp-1 {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
 
         ::-webkit-scrollbar { width: 0px; background: transparent; }
@@ -1741,6 +1780,114 @@ export default function App() {
         .lenis.lenis-smooth { scroll-behavior: auto; }
         .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
         .lenis.lenis-stopped { overflow: hidden; }
+
+        /* Grain noise overlay */
+        .grain-overlay {
+          position: fixed;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 9999;
+          opacity: 0.022;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+          background-repeat: repeat;
+          background-size: 180px 180px;
+        }
+        @keyframes grain-shift {
+          0%   { transform: translate(0, 0); }
+          12%  { transform: translate(-4%, -7%); }
+          25%  { transform: translate(5%, 3%); }
+          37%  { transform: translate(-7%, 5%); }
+          50%  { transform: translate(3%, -5%); }
+          62%  { transform: translate(-5%, 7%); }
+          75%  { transform: translate(7%, -3%); }
+          87%  { transform: translate(-3%, 6%); }
+          100% { transform: translate(0, 0); }
+        }
+
+        /* Marquee */
+        @keyframes marquee-scroll {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .marquee-track {
+          animation: marquee-scroll 22s linear infinite;
+        }
+        .marquee-track:hover {
+          animation-play-state: paused;
+        }
+
+        /* Gallery masonry grid */
+        .gallery-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          grid-auto-rows: 220px;
+          gap: 10px;
+        }
+        .gallery-cell {
+          grid-row: span 1;
+        }
+        .gallery-cell--wide {
+          grid-column: span 2;
+        }
+
+        /* Empty-state cells */
+        .gal-empty-cell {
+          border: 1px solid rgba(11,11,11,0.07);
+          background: transparent;
+          position: relative;
+          overflow: hidden;
+        }
+        .gal-empty-cell::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(11,11,11,0.015) 0%, transparent 60%);
+        }
+
+        /* Scan-line per cell */
+        .gal-scan-line {
+          position: absolute;
+          top: -2px;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent 0%, rgba(11,11,11,0.12) 35%, rgba(11,11,11,0.28) 50%, rgba(11,11,11,0.12) 65%, transparent 100%);
+          animation: gallery-scan 3.5s ease-in-out infinite;
+          animation-delay: var(--delay, 0s);
+        }
+        @keyframes gallery-scan {
+          0%   { top: -2px; opacity: 0; }
+          6%   { opacity: 1; }
+          92%  { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+
+        @media (max-width: 1023px) {
+          .gallery-grid {
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-rows: 200px;
+          }
+          .gallery-cell--wide {
+            grid-column: span 2;
+          }
+        }
+        @media (max-width: 639px) {
+          .gallery-grid {
+            grid-template-columns: 1fr;
+            grid-auto-rows: 220px;
+          }
+          .gallery-cell--wide {
+            grid-column: span 1;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .marquee-track { animation: none; }
+          .grain-overlay { animation: none; }
+          .gal-scan-line { animation: none; }
+        }
       `}} />
     </div>
   );
