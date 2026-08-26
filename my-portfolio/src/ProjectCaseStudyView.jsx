@@ -244,25 +244,21 @@ export default function ProjectCaseStudyView({
 
       <footer className="case-study__handoff" data-case-handoff>
         <div className="case-study__handoff-panel">
-          <p className="case-study__handoff-label">Scroll to continue</p>
-          <div className="case-study__handoff-milestones" aria-hidden="true">
+          <button
+            type="button"
+            className="case-study__handoff-milestone-button"
+            aria-label={nextProject ? `Continue to ${nextProject.title}` : 'Return to Works'}
+            onClick={navigateToDestination}
+          >
             <span>{handoffLabels.current}</span>
             <span>{handoffLabels.destination}</span>
-          </div>
+          </button>
           <span className="case-study__handoff-track" aria-hidden="true">
             <span
               data-handoff-progress
               style={{ transform: `scaleX(${handoffProgress})` }}
             />
           </span>
-          <button
-            type="button"
-            aria-label={nextProject ? `Continue to ${nextProject.title}` : 'Return to Works'}
-            onClick={navigateToDestination}
-          >
-            <span>{nextProject ? nextProject.title : 'Return to Works'}</span>
-            <span aria-hidden="true">↗</span>
-          </button>
         </div>
       </footer>
     </article>

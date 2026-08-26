@@ -48,9 +48,9 @@ test('presents an opened project as a website case study rather than an art port
     assert.doesNotMatch(markup, /<figcaption>|Desktop|case-study__browser/);
     assert.match(markup, /data-case-handoff=/);
     assert.match(markup, /data-handoff-progress=/);
-    assert.match(markup, /Scroll to continue/);
-    assert.match(markup, /01 \/ 02/);
-    assert.match(markup, /02 \/ 02/);
+    assert.doesNotMatch(markup, /Scroll to continue/);
+    assert.match(markup, /class="case-study__handoff-milestone-button"[^>]*>[\s\S]*01 \/ 02[\s\S]*02 \/ 02[\s\S]*<\/button>/);
+    assert.doesNotMatch(markup, />Vouch Dashboard<\/span>/);
     assert.match(markup, /aria-label="Continue to Vouch Dashboard"/);
     assert.equal((markup.match(/data-case-study-screen=/g) ?? []).length, 3);
     assert.equal((markup.match(/data-case-image-frame=/g) ?? []).length, 0);

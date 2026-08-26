@@ -102,7 +102,7 @@
   display: grid;
   grid-template-columns: minmax(13rem, 22vw) minmax(0, 1fr);
   gap: 4vw;
-  padding-bottom: 11rem;
+  padding-bottom: 0;
 }
 
 .case-study__milestones {
@@ -164,6 +164,10 @@
   margin: 0 0 clamp(8rem, 15vw, 16rem);
 }
 
+.case-study__screen:last-child {
+  margin-bottom: clamp(4rem, 7vw, 7rem);
+}
+
 .case-study__screen--1 { width: 94%; }
 .case-study__screen--2 { width: 82%; margin-left: auto; }
 .case-study__screen--3 { width: 72%; margin-left: 5%; }
@@ -178,41 +182,40 @@
 
 .case-study__handoff {
   position: relative;
-  min-height: 120svh;
+  min-height: 45svh;
   margin: 0 -3rem;
-  border-top: 1px solid rgba(11, 11, 11, 0.22);
 }
 
 .case-study__handoff-panel {
   position: sticky;
-  top: 0;
-  display: flex;
-  min-height: 100svh;
-  flex-direction: column;
-  justify-content: center;
-  padding: 3rem;
+  top: calc(100svh - 6.5rem);
+  display: grid;
+  min-height: 6.5rem;
+  align-content: center;
+  gap: 0.8rem;
+  padding: 1.25rem 3rem 1.5rem;
+  border-top: 1px solid rgba(11, 11, 11, 0.22);
   background: var(--case-paper);
 }
 
-.case-study__handoff-label {
-  margin: 0 0 auto;
-  padding-top: 1rem;
-  color: var(--case-muted);
-  font-size: 0.7rem;
-}
-
-.case-study__handoff-milestones {
+.case-study__handoff-milestone-button {
   display: flex;
+  width: 100%;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
   font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
+  cursor: pointer;
 }
 
 .case-study__handoff-track {
   display: block;
   width: 100%;
-  height: 1px;
+  height: 2px;
   overflow: hidden;
   background: rgba(11, 11, 11, 0.18);
 }
@@ -224,22 +227,7 @@
   background: var(--case-ink);
   transform: scaleX(0);
   transform-origin: left center;
-}
-
-.case-study__handoff button {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  margin-top: 2rem;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-size: clamp(2.8rem, 7vw, 7.5rem);
-  letter-spacing: -0.07em;
-  text-align: left;
-  cursor: pointer;
+  will-change: transform;
 }
 
 @media (max-width: 768px) {
@@ -264,9 +252,13 @@
   .case-study__screen--2,
   .case-study__screen--3 { width: 100%; margin-left: 0; }
   .case-study__screen { margin-bottom: 6rem; }
+  .case-study__screen:last-child { margin-bottom: 3.5rem; }
   .case-study__handoff { margin: 0 -1.5rem; }
-  .case-study__handoff-panel { padding: 1.5rem; }
-  .case-study__handoff button { font-size: clamp(2.65rem, 13vw, 4.6rem); }
+  .case-study__handoff-panel {
+    top: calc(100svh - 5.5rem);
+    min-height: 5.5rem;
+    padding: 1rem 1.5rem 1.25rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
