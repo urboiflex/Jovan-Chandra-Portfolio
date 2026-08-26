@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 
 import {
   clampHandoffProgress,
+  createHandoffNavigator,
   getCaseHeroParallaxMotion,
   getCaseMilestoneTrigger,
   getHandoffLabels,
@@ -23,20 +24,21 @@ export default function ProjectCaseStudyView({
 }) {
   const rootRef = useRef(null);
   const handoffLockedRef = useRef(false);
+  const handoffDestinationRef = useRef({ nextProject, onNext, onBack });
+  const handoffNavigatorRef = useRef(null);
   const [activeScreen, setActiveScreen] = useState(0);
   const [handoffProgress, setHandoffProgress] = useState(0);
   const gallery = project.gallery?.length ? project.gallery : [project.img];
   const handoffLabels = getHandoffLabels(currentProjectIndex, projectCount);
+  handoffDestinationRef.current = { nextProject, onNext, onBack };
 
-  const navigateToDestination = () => {
-    if (handoffLockedRef.current) return;
-    handoffLockedRef.current = true;
-    if (nextProject) {
-      onNext(nextProject.id);
-      return;
-    }
-    onBack();
-  };
+  if (!handoffNavigatorRef.current) {
+    handoffNavigatorRef.current = createHandoffNavigator({
+      destinationRef: handoffDestinationRef,
+      lockRef: handoffLockedRef,
+    });
+  }
+  const navigateToDestination = handoffNavigatorRef.current;
 
   useLayoutEffect(() => {
     handoffLockedRef.current = false;

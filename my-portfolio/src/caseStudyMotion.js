@@ -55,12 +55,30 @@ export const shouldCompleteHandoff = ({
   && clampHandoffProgress(progress) >= CASE_STUDY_HANDOFF_THRESHOLD
 );
 
-export const restoreCaseStudyScroll = (controller, fallbackScroll) => {
-  if (!controller) {
-    fallbackScroll();
-    return;
+export const createHandoffNavigator = ({ destinationRef, lockRef }) => () => {
+  if (lockRef.current) return false;
+  lockRef.current = true;
+  const { nextProject, onNext, onBack } = destinationRef.current;
+  if (nextProject) {
+    onNext(nextProject.id);
+  } else {
+    onBack();
   }
+  return true;
+};
 
-  controller.scrollTo(0, { immediate: true });
-  controller.start();
+export const restoreCaseStudyScroll = (
+  controller,
+  fallbackScroll,
+  schedule = requestAnimationFrame,
+) => {
+  schedule(() => {
+    if (!controller) {
+      fallbackScroll();
+      return;
+    }
+
+    controller.scrollTo(0, { immediate: true, force: true });
+    controller.start();
+  });
 };

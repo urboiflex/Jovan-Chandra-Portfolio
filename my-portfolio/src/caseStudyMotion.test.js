@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   CASE_STUDY_HANDOFF_THRESHOLD,
   clampHandoffProgress,
+  createHandoffNavigator,
   getCaseHeroParallaxMotion,
   getCaseMilestoneTrigger,
   getHandoffLabels,
@@ -81,17 +82,50 @@ test('completes only when a downward handoff reaches the threshold once', () => 
   assert.equal(shouldCompleteHandoff({ progress: 0.98, direction: 1, isLocked: false, reducedMotion: false }), true);
 });
 
-test('resets and resumes Lenis as soon as the project route swaps', () => {
+test('uses the latest destination callback when the handoff completes', () => {
   const calls = [];
+  const destinationRef = {
+    current: {
+      nextProject: { id: '02' },
+      onNext: () => calls.push('stale callback'),
+      onBack: () => calls.push('stale back'),
+    },
+  };
+  const lockRef = { current: false };
+  const navigate = createHandoffNavigator({ destinationRef, lockRef });
+
+  destinationRef.current = {
+    nextProject: { id: '02' },
+    onNext: (id) => calls.push(id),
+    onBack: () => calls.push('works'),
+  };
+
+  assert.equal(navigate(), true);
+  assert.deepEqual(calls, ['02']);
+  assert.equal(navigate(), false);
+  assert.deepEqual(calls, ['02']);
+});
+
+test('resets and resumes Lenis after the destination render is scheduled', () => {
+  const calls = [];
+  const scheduled = [];
   const controller = {
     scrollTo(target, options) { calls.push(['scrollTo', target, options]); },
     start() { calls.push(['start']); },
   };
 
-  restoreCaseStudyScroll(controller, () => calls.push(['fallback']));
+  restoreCaseStudyScroll(
+    controller,
+    () => calls.push(['fallback']),
+    (callback) => scheduled.push(callback),
+  );
+
+  assert.deepEqual(calls, []);
+  assert.equal(scheduled.length, 1);
+  scheduled[0]();
 
   assert.deepEqual(calls, [
-    ['scrollTo', 0, { immediate: true }],
+    ['scrollTo', 0, { immediate: true, force: true }],
     ['start'],
   ]);
 });
