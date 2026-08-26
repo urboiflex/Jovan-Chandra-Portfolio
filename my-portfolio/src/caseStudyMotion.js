@@ -15,6 +15,11 @@ export const getCaseMilestoneTrigger = () => ({
 
 export const CASE_STUDY_HANDOFF_THRESHOLD = 0.98;
 
+export const getHandoffTriggerStart = (bannerHeight) => {
+  const height = Math.max(0, Math.round(Number(bannerHeight) || 0));
+  return height > 0 ? `top bottom-=${height}` : 'top bottom';
+};
+
 export const clampHandoffProgress = (value) => {
   if (!Number.isFinite(value)) return 0;
   return Math.min(1, Math.max(0, value));

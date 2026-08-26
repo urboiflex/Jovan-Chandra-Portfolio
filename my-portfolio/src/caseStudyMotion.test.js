@@ -6,6 +6,7 @@ import {
   clampHandoffProgress,
   createHandoffNavigator,
   getCaseHeroParallaxMotion,
+  getHandoffTriggerStart,
   getCaseMilestoneTrigger,
   getHandoffLabels,
   getMilestoneProgressMotion,
@@ -56,6 +57,11 @@ test('normalizes handoff progress into the ScrollTrigger range', () => {
   assert.equal(clampHandoffProgress(0.375), 0.375);
   assert.equal(clampHandoffProgress(1.4), 1);
   assert.equal(clampHandoffProgress(Number.NaN), 0);
+});
+
+test('starts the project handoff only after the full banner is visible', () => {
+  assert.equal(getHandoffTriggerStart(230), 'top bottom-=230');
+  assert.equal(getHandoffTriggerStart(0), 'top bottom');
 });
 
 test('derives intermediate and final handoff milestones from project position', () => {

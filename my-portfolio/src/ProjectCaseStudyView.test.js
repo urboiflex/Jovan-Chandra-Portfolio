@@ -49,13 +49,15 @@ test('presents an opened project as a website case study rather than an art port
     assert.match(markup, /data-case-handoff=/);
     assert.match(markup, /data-handoff-progress=/);
     assert.doesNotMatch(markup, /Scroll to continue/);
-    assert.match(markup, /class="case-study__handoff-milestone-button"[^>]*>[\s\S]*01 \/ 02[\s\S]*02 \/ 02[\s\S]*<\/button>/);
-    assert.doesNotMatch(markup, />Vouch Dashboard<\/span>/);
+    assert.match(markup, /class="case-study__handoff-milestones"[^>]*>[\s\S]*01 \/ 02[\s\S]*02 \/ 02/);
+    assert.match(markup, /data-handoff-title[^>]*>Vouch Dashboard<\/span>/);
+    assert.match(markup, /data-handoff-invert=/);
     assert.match(markup, /aria-label="Continue to Vouch Dashboard"/);
     assert.equal((markup.match(/data-case-study-screen=/g) ?? []).length, 3);
     assert.equal((markup.match(/data-case-image-frame=/g) ?? []).length, 0);
     assert.equal((markup.match(/data-case-screen-image=/g) ?? []).length, 3);
-    assert.match(markup, /aria-label="Back to Works"/);
+    assert.match(markup, /class="case-study__back project-link group"[^>]*aria-label="Back to Works"/);
+    assert.match(markup, /aria-label="Back"/);
 
     const finalMarkup = renderToStaticMarkup(React.createElement(ProjectCaseStudyView, {
       project,

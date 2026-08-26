@@ -20,7 +20,18 @@
 }
 
 .case-study__header > p { margin: 0; }
-.case-study__back { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.case-study__back {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
 
 .case-study__hero {
   display: grid;
@@ -182,51 +193,96 @@
 
 .case-study__handoff {
   position: relative;
-  min-height: 45svh;
+  min-height: 100svh;
   margin: 0 -3rem;
 }
 
 .case-study__handoff-panel {
   position: sticky;
-  top: calc(100svh - 6.5rem);
+  top: calc(100svh - clamp(12rem, 18vw, 16rem));
   display: grid;
-  min-height: 6.5rem;
+  min-height: clamp(12rem, 18vw, 16rem);
   align-content: center;
-  gap: 0.8rem;
-  padding: 1.25rem 3rem 1.5rem;
-  border-top: 1px solid rgba(11, 11, 11, 0.22);
+  gap: 1rem;
+  padding: 1.4rem 3rem 2rem;
   background: var(--case-paper);
 }
 
-.case-study__handoff-milestone-button {
+.case-study__handoff-milestones {
   display: flex;
-  width: 100%;
   justify-content: space-between;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
   font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
+}
+
+.case-study__handoff-link {
+  position: relative;
+  display: grid;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(11, 11, 11, 0.24);
+  padding: 0;
+  background: transparent;
+  color: var(--case-ink);
+  font: inherit;
+  text-align: left;
+  isolation: isolate;
   cursor: pointer;
 }
 
-.case-study__handoff-track {
-  display: block;
-  width: 100%;
-  height: 2px;
-  overflow: hidden;
-  background: rgba(11, 11, 11, 0.18);
+.case-study__handoff-content {
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.15rem 1.35rem 1.35rem;
+  font-size: clamp(2.8rem, 6.4vw, 7rem);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.065em;
+  will-change: transform;
 }
 
-.case-study__handoff-track > span {
-  display: block;
-  width: 100%;
-  height: 100%;
+.case-study__handoff-content > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.case-study__handoff-fill,
+.case-study__handoff-invert {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.case-study__handoff-fill {
+  z-index: 0;
   background: var(--case-ink);
   transform: scaleX(0);
   transform-origin: left center;
+  will-change: transform;
+}
+
+.case-study__handoff-invert {
+  z-index: 2;
+  overflow: hidden;
+  color: white;
+  clip-path: inset(0 100% 0 0);
+  will-change: clip-path;
+}
+
+.case-study__handoff-invert .case-study__handoff-content {
+  position: absolute;
+  inset: 0;
+}
+
+.case-study__handoff-arrow {
+  flex: 0 0 auto;
+  margin-left: 2rem;
+  font-size: 0.68em;
+  letter-spacing: 0;
   will-change: transform;
 }
 
@@ -255,10 +311,12 @@
   .case-study__screen:last-child { margin-bottom: 3.5rem; }
   .case-study__handoff { margin: 0 -1.5rem; }
   .case-study__handoff-panel {
-    top: calc(100svh - 5.5rem);
-    min-height: 5.5rem;
-    padding: 1rem 1.5rem 1.25rem;
+    top: calc(100svh - 10rem);
+    min-height: 10rem;
+    padding: 1rem 1.5rem 1.5rem;
   }
+  .case-study__handoff-content { padding: 1rem 0.9rem 1.1rem; font-size: clamp(2rem, 9vw, 3.5rem); }
+  .case-study__handoff-arrow { margin-left: 1rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

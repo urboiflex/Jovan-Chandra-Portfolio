@@ -5,6 +5,7 @@ import {
   createHandoffNavigator,
   getCaseHeroParallaxMotion,
   getCaseMilestoneTrigger,
+  getHandoffTriggerStart,
   getHandoffLabels,
   getMilestoneProgressMotion,
   shouldCompleteHandoff,
@@ -27,9 +28,9 @@ export default function ProjectCaseStudyView({
   const handoffDestinationRef = useRef({ nextProject, onNext, onBack });
   const handoffNavigatorRef = useRef(null);
   const [activeScreen, setActiveScreen] = useState(0);
-  const [handoffProgress, setHandoffProgress] = useState(0);
   const gallery = project.gallery?.length ? project.gallery : [project.img];
   const handoffLabels = getHandoffLabels(currentProjectIndex, projectCount);
+  const handoffTitle = nextProject ? nextProject.title : 'Works';
   handoffDestinationRef.current = { nextProject, onNext, onBack };
 
   if (!handoffNavigatorRef.current) {
@@ -42,7 +43,6 @@ export default function ProjectCaseStudyView({
 
   useLayoutEffect(() => {
     handoffLockedRef.current = false;
-    setHandoffProgress(0);
     if (!rootRef.current || !shouldInitializeCaseStudy({
       isLoaded,
       hasGsap: Boolean(window.gsap),
@@ -127,23 +127,43 @@ export default function ProjectCaseStudyView({
 
       const handoff = rootRef.current.querySelector('[data-case-handoff]');
       if (handoff) {
-        window.ScrollTrigger.create({
-          trigger: handoff,
-          start: 'top bottom',
-          end: 'bottom bottom',
-          onUpdate: (self) => {
-            const progressValue = clampHandoffProgress(self.progress);
-            setHandoffProgress(progressValue);
-            if (shouldCompleteHandoff({
-              progress: progressValue,
-              direction: self.direction,
-              isLocked: handoffLockedRef.current,
-              reducedMotion,
-            })) {
-              navigateToDestination();
-            }
+        const handoffPanel = handoff.querySelector('.case-study__handoff-panel');
+        const handoffFill = handoff.querySelector('[data-handoff-progress]');
+        const handoffInvert = handoff.querySelector('[data-handoff-invert]');
+        const handoffContents = handoff.querySelectorAll('[data-handoff-content]');
+        const handoffArrows = handoff.querySelectorAll('[data-handoff-arrow]');
+
+        const handoffTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: handoff,
+            start: () => getHandoffTriggerStart(handoffPanel?.offsetHeight),
+            end: 'bottom bottom',
+            scrub: 0.65,
+            onUpdate: (self) => {
+              const progressValue = clampHandoffProgress(self.progress);
+              if (shouldCompleteHandoff({
+                progress: progressValue,
+                direction: self.direction,
+                isLocked: handoffLockedRef.current,
+                reducedMotion,
+              })) {
+                navigateToDestination();
+              }
+            },
           },
         });
+
+        handoffTimeline
+          .fromTo(handoffFill, { scaleX: 0 }, { scaleX: 1, ease: 'none' }, 0)
+          .fromTo(handoffInvert,
+            { clipPath: 'inset(0 100% 0 0)' },
+            { clipPath: 'inset(0 0% 0 0)', ease: 'none' }, 0)
+          .fromTo(handoffContents,
+            { x: 0 },
+            { x: 20, ease: 'power2.inOut' }, 0)
+          .fromTo(handoffArrows,
+            { x: 0, y: 0 },
+            { x: 8, y: -8, ease: 'power2.inOut' }, 0);
       }
     }, rootRef);
 
@@ -163,10 +183,10 @@ export default function ProjectCaseStudyView({
   return (
     <article ref={rootRef} className="case-study">
       <header className="case-study__header">
-        <button type="button" className="case-study__back project-link" aria-label="Back to Works" onClick={onBack}>
-          <SplitHoverText text="back" height="15px" distance="14px" />
-        </button>
         <p data-case-intro>Website case study</p>
+        <button type="button" className="case-study__back project-link group" aria-label="Back to Works" onClick={onBack}>
+          <SplitHoverText text="Back" height="17px" distance="16px" />
+        </button>
       </header>
 
       <section className="case-study__hero" aria-labelledby="case-study-title">
@@ -244,21 +264,28 @@ export default function ProjectCaseStudyView({
 
       <footer className="case-study__handoff" data-case-handoff>
         <div className="case-study__handoff-panel">
+          <div className="case-study__handoff-milestones" aria-hidden="true">
+            <span>{handoffLabels.current}</span>
+            <span>{handoffLabels.destination}</span>
+          </div>
           <button
             type="button"
-            className="case-study__handoff-milestone-button"
+            className="case-study__handoff-link"
             aria-label={nextProject ? `Continue to ${nextProject.title}` : 'Return to Works'}
             onClick={navigateToDestination}
           >
-            <span>{handoffLabels.current}</span>
-            <span>{handoffLabels.destination}</span>
+            <span className="case-study__handoff-content" data-handoff-content>
+              <span data-handoff-title>{handoffTitle}</span>
+              <span className="case-study__handoff-arrow" data-handoff-arrow aria-hidden="true">↗</span>
+            </span>
+            <span className="case-study__handoff-fill" data-handoff-progress aria-hidden="true" />
+            <span className="case-study__handoff-invert" data-handoff-invert aria-hidden="true">
+              <span className="case-study__handoff-content" data-handoff-content>
+                <span>{handoffTitle}</span>
+                <span className="case-study__handoff-arrow" data-handoff-arrow>↗</span>
+              </span>
+            </span>
           </button>
-          <span className="case-study__handoff-track" aria-hidden="true">
-            <span
-              data-handoff-progress
-              style={{ transform: `scaleX(${handoffProgress})` }}
-            />
-          </span>
         </div>
       </footer>
     </article>
