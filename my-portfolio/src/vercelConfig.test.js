@@ -13,4 +13,12 @@ test('serves client-side project routes through the Vite entry point on Vercel',
   assert.deepEqual(config.rewrites, [
     { source: '/(.*)', destination: '/index.html' },
   ]);
+  assert.deepEqual(config.redirects, [
+    {
+      source: '/(.*)',
+      has: [{ type: 'header', key: 'x-forwarded-proto', value: 'http' }],
+      destination: 'https://jovanchandra.me/$1',
+      permanent: true,
+    },
+  ]);
 });
