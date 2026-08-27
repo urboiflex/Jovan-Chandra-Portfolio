@@ -1,0 +1,22 @@
+.split-hover-text,
+.split-hover-text__char {
+  height: var(--split-hover-height, 19.2px);
+  overflow: clip;
+}
+
+.split-hover-text__char {
+  line-height: var(--split-hover-height, 19.2px);
+}
+
+.split-hover-text__track {
+  transform: translate3d(0, 0, 0);
+}
+
+.split-hover-text__track--clone {
+  top: var(--split-hover-distance, 17px);
+}
+
+.group:hover .split-hover-text__track,
+.group:focus-visible .split-hover-text__track {
+  transform: translate3d(0, calc(0px - var(--split-hover-distance, 17px)), 0);
+}

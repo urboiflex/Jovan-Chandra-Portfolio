@@ -183,10 +183,16 @@
 .case-study__screen--2 { width: 82%; margin-left: auto; }
 .case-study__screen--3 { width: 72%; margin-left: 5%; }
 .case-study__screen-index { display: block; margin-bottom: 0.65rem; color: var(--case-muted); font-size: 0.64rem; font-variant-numeric: tabular-nums; }
-.case-study__screen-frame { overflow: hidden; background: transparent; }
+.case-study__screen-frame {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  background: transparent;
+}
 .case-study__screen img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
   border: 0;
 }
@@ -220,7 +226,9 @@
   display: grid;
   width: 100%;
   overflow: hidden;
-  border: 1px solid rgba(11, 11, 11, 0.24);
+  border: 0;
+  border-top: 1px solid rgba(11, 11, 11, 0.24);
+  border-bottom: 1px solid rgba(11, 11, 11, 0.24);
   padding: 0;
   background: transparent;
   color: var(--case-ink);
@@ -241,7 +249,6 @@
   font-weight: 400;
   line-height: 0.92;
   letter-spacing: -0.065em;
-  will-change: transform;
 }
 
 .case-study__handoff-content > span:first-child {
@@ -283,7 +290,6 @@
   margin-left: 2rem;
   font-size: 0.68em;
   letter-spacing: 0;
-  will-change: transform;
 }
 
 @media (max-width: 768px) {

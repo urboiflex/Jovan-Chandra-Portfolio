@@ -1,6 +1,7 @@
 import { forwardRef, useLayoutEffect, useRef, useState } from 'react';
 
 import SplitHoverText from './SplitHoverText.jsx';
+import { getCompactProjectTools } from './projectTechnology.js';
 import {
   getWorksStickyExitDistance,
   getWorksThumbnailPlacement,
@@ -139,8 +140,8 @@ const WorksArchiveView = forwardRef(function WorksArchiveView({
     <section ref={rootRef} className="works-archive" aria-labelledby="works-archive-title">
       <h1 ref={titleRef} id="works-archive-title" className="works-archive__title" tabIndex="-1">Works</h1>
 
-      <button type="button" className="works-archive__back project-link" aria-label="Back" onClick={onBack} data-detail-back>
-        <SplitHoverText text="back" height="15px" distance="14px" />
+      <button type="button" className="works-archive__back project-link group" aria-label="Back" onClick={onBack} data-detail-back>
+        <SplitHoverText text="Back" height="17px" distance="16px" />
       </button>
 
       <div className="works-archive__content" data-detail-main>
@@ -159,7 +160,7 @@ const WorksArchiveView = forwardRef(function WorksArchiveView({
                 <p className="works-archive__statement">{getCompactStatement(project.desc)}</p>
                 <div className="works-archive__project-meta">
                   <p>{project.roles}</p>
-                  <p>{project.tools.join(' · ')}</p>
+                  <p>{getCompactProjectTools(project.tools).join(' · ')}</p>
                 </div>
               </div>
 

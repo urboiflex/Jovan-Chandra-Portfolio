@@ -6,6 +6,7 @@ import {
   clampHandoffProgress,
   createHandoffNavigator,
   getCaseHeroParallaxMotion,
+  getHandoffScrollTriggerConfig,
   getHandoffTriggerStart,
   getCaseMilestoneTrigger,
   getHandoffLabels,
@@ -64,6 +65,24 @@ test('starts the project handoff only after the full banner is visible', () => {
   assert.equal(getHandoffTriggerStart(0), 'top bottom');
 });
 
+test('pins the current case-study viewport while the handoff charges', () => {
+  const pin = { id: 'case-study' };
+  const onUpdate = () => {};
+  const onScrubComplete = () => {};
+
+  assert.deepEqual(getHandoffScrollTriggerConfig({ bannerHeight: 230, pin, onUpdate, onScrubComplete }), {
+    start: 'top bottom-=230',
+    end: 'bottom bottom',
+    scrub: 1.05,
+    pin,
+    pinSpacing: false,
+    pinType: 'fixed',
+    anticipatePin: 0,
+    onUpdate,
+    onScrubComplete,
+  });
+});
+
 test('derives intermediate and final handoff milestones from project position', () => {
   assert.deepEqual(getHandoffLabels(0, 2), {
     current: '01 / 02',
@@ -112,6 +131,32 @@ test('uses the latest destination callback when the handoff completes', () => {
   assert.deepEqual(calls, ['02']);
 });
 
+test('defers automatic handoff callbacks outside the outgoing GSAP context', () => {
+  const calls = [];
+  const scheduled = [];
+  const destinationRef = {
+    current: {
+      nextProject: { id: '02' },
+      onNext: (id) => calls.push(id),
+      onBack: () => calls.push('works'),
+    },
+  };
+  const lockRef = { current: false };
+  const navigate = createHandoffNavigator({
+    destinationRef,
+    lockRef,
+    schedule: (callback) => scheduled.push(callback),
+  });
+
+  assert.equal(navigate(), true);
+  assert.equal(lockRef.current, true);
+  assert.deepEqual(calls, []);
+  assert.equal(scheduled.length, 1);
+
+  scheduled[0]();
+  assert.deepEqual(calls, ['02']);
+});
+
 test('resets and resumes Lenis after the destination render is scheduled', () => {
   const calls = [];
   const scheduled = [];
@@ -133,5 +178,27 @@ test('resets and resumes Lenis after the destination render is scheduled', () =>
   assert.deepEqual(calls, [
     ['scrollTo', 0, { immediate: true, force: true }],
     ['start'],
+  ]);
+});
+
+test('can reset the destination while keeping Lenis paused through the curtain transition', () => {
+  const calls = [];
+  const scheduled = [];
+  const controller = {
+    scrollTo(target, options) { calls.push(['scrollTo', target, options]); },
+    start() { calls.push(['start']); },
+  };
+
+  restoreCaseStudyScroll(
+    controller,
+    () => calls.push(['fallback']),
+    (callback) => scheduled.push(callback),
+    { resume: false },
+  );
+
+  scheduled[0]();
+
+  assert.deepEqual(calls, [
+    ['scrollTo', 0, { immediate: true, force: true }],
   ]);
 });

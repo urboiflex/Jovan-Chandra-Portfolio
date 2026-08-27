@@ -1,0 +1,659 @@
+.cinematic-contact {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  min-height: 180vh;
+  overflow: clip;
+  isolation: isolate;
+  z-index: 2;
+  background: #020108;
+  color: #f5f5f2;
+}
+
+.cinematic-contact__backdrop {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  /* The black panel moves over this underlay during the footer handoff. */
+  background: var(--color-bg, #f5f5f2);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.cinematic-contact__surface {
+  position: fixed;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 180vh;
+  min-height: 0;
+  overflow: hidden;
+  background: #020108;
+  transform: translate3d(0, 18vh, 0);
+  visibility: hidden;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.cinematic-contact__stage {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  height: 100vh;
+  min-height: 42rem;
+  overflow: hidden;
+  color: #f5f5f2;
+  transform: translate3d(0, 18vh, 0);
+  will-change: transform;
+}
+
+.cinematic-contact__title {
+  position: absolute;
+  z-index: 3;
+  top: 10%;
+  left: 6%;
+  margin: 0;
+  color: #f5f5f2;
+  opacity: 1;
+  /* GSAP toggles visibility at the reveal point; keeping the fallback
+     visible means the heading remains available if the motion library fails. */
+  visibility: visible;
+  transform: translate3d(110vw, 0, 0);
+  font-size: clamp(5rem, 13vw, 12rem);
+  font-weight: 500;
+  line-height: 0.88;
+  letter-spacing: -0.07em;
+  white-space: nowrap;
+  will-change: transform, clip-path;
+  pointer-events: none;
+}
+
+.cinematic-contact__frame {
+  position: absolute;
+  z-index: 2;
+  width: 25%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: transparent;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.cinematic-contact__frame--first {
+  top: 10%;
+  left: 75%;
+}
+
+.cinematic-contact__frame--second {
+  top: 70%;
+  left: 50%;
+}
+
+.cinematic-contact__placeholder {
+  display: block;
+  width: 100%;
+  height: 145%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.cinematic-contact__placeholder--first {
+  object-position: 50% 44%;
+}
+
+.cinematic-contact__placeholder--second {
+  object-position: 50% 52%;
+}
+
+.cinematic-contact__copy {
+  position: absolute;
+  z-index: 4;
+  width: 12.5%;
+  margin: 0;
+  color: #f5f5f2;
+  text-align: justify;
+  will-change: transform, opacity, clip-path;
+  pointer-events: none;
+}
+
+.cinematic-contact__copy--first {
+  top: 32%;
+  left: 56.25%;
+}
+
+.cinematic-contact__copy--second {
+  top: 72%;
+  left: 81.25%;
+}
+
+.cinematic-contact__copy p {
+  margin: 0.65rem 0;
+  font-size: clamp(0.95rem, 1.5vw, 1.35rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.cinematic-contact__copy em {
+  font-family: var(--font-editorial);
+  font-size: 1.04em;
+  font-style: italic;
+}
+
+.cinematic-contact__corner {
+  position: absolute;
+  z-index: 3;
+  width: 11px;
+  height: 11px;
+  border-color: rgba(255, 255, 255, 0.9);
+  border-style: solid;
+}
+
+.cinematic-contact__corner--tl {
+  top: 8px;
+  left: 8px;
+  border-width: 1px 0 0 1px;
+}
+
+.cinematic-contact__corner--tr {
+  top: 8px;
+  right: 8px;
+  border-width: 1px 1px 0 0;
+}
+
+.cinematic-contact__corner--bl {
+  bottom: 8px;
+  left: 8px;
+  border-width: 0 0 1px 1px;
+}
+
+.cinematic-contact__corner--br {
+  right: 8px;
+  bottom: 8px;
+  border-width: 0 1px 1px 0;
+}
+
+.cinematic-contact__bottom {
+  position: absolute;
+  z-index: 5;
+  bottom: 5vh;
+  left: 6%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.15rem;
+  will-change: transform, opacity, clip-path;
+}
+
+.cinematic-contact__socials {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  clip-path: inset(0 0 100% 0);
+  will-change: clip-path;
+}
+
+.cinematic-contact__socials a,
+.cinematic-contact__mail {
+  color: #f5f5f2;
+  text-decoration: none;
+}
+
+.cinematic-contact__socials a {
+  display: block;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.cinematic-contact__mail {
+  clip-path: inset(0 0 100% 0);
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  letter-spacing: -0.025em;
+  will-change: clip-path;
+}
+
+.cinematic-contact__email-link {
+  position: relative;
+  display: inline-block;
+}
+
+.cinematic-contact__email-link::after {
+  position: absolute;
+  right: 0;
+  bottom: -0.22em;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 560ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinematic-contact__email-link:hover::after,
+.cinematic-contact__email-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.cinematic-contact__mail.cinematic-contact__email-link::after {
+  bottom: 0.02em;
+  height: 2px;
+}
+
+.cinematic-contact__footer {
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  min-height: 100vh;
+  margin-left: calc(50% - 50vw);
+  margin-bottom: -8rem;
+  overflow: clip;
+  color: var(--color-text, #0b0b0b);
+  background: var(--color-bg, #f5f5f2);
+  /* GSAP applies the initial -10% overlap and scrubs it to 0%. */
+  transform: none;
+  will-change: transform;
+}
+
+.cinematic-contact__footer-scene {
+  position: absolute;
+  inset: 0;
+  min-height: 100%;
+  will-change: transform;
+}
+
+.cinematic-contact__footer-content {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(16rem, 1.65fr) minmax(8rem, 0.55fr) minmax(15rem, 0.95fr) minmax(17rem, 1fr);
+  gap: clamp(2rem, 4vw, 5rem);
+  min-height: 55vh;
+  padding: clamp(4rem, 7vw, 7rem) clamp(1.25rem, 4vw, 5rem) 2rem;
+  will-change: transform, opacity;
+}
+
+.cinematic-contact__footer-intro h2 {
+  max-width: 13ch;
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(2.5rem, 4.8vw, 5.5rem);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.065em;
+}
+
+.cinematic-contact__footer-intro em {
+  font-family: var(--font-editorial);
+  font-weight: 400;
+}
+
+.cinematic-contact__footer-nav,
+.cinematic-contact__footer-connections {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.28rem;
+}
+
+.cinematic-contact__footer-link {
+  display: block;
+  max-width: 100%;
+  color: inherit;
+  font-size: clamp(1.35rem, 1.75vw, 2rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-decoration: none;
+}
+
+.cinematic-contact__footer-connections .cinematic-contact__footer-link:last-child {
+  margin-top: 1rem;
+  font-size: clamp(1rem, 1.25vw, 1.35rem);
+  letter-spacing: -0.025em;
+}
+
+.cinematic-contact__footer-clocks {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vh, 3.5rem);
+}
+
+.cinematic-contact__clock {
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(11, 11, 11, 0.18);
+}
+
+.cinematic-contact__clock-heading {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted, #696965);
+  font-size: 0.67rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cinematic-contact__clock-time {
+  display: flex;
+  align-items: flex-start;
+  height: 1.12em;
+  margin-top: 0.75rem;
+  overflow: hidden;
+  font-family: inherit;
+  font-size: clamp(1.2rem, 1.55vw, 1.8rem);
+  font-style: normal;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.cinematic-contact__clock-segment {
+  position: relative;
+  display: inline-block;
+  width: 2ch;
+  height: 1.08em;
+  overflow: hidden;
+}
+
+.cinematic-contact__clock-separator {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 0.55ch;
+  height: 1.08em;
+  line-height: 0.88;
+  text-align: center;
+}
+
+.cinematic-contact__clock-value {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  will-change: transform, opacity;
+}
+
+.cinematic-contact__clock-value--current {
+  animation: contact-clock-enter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cinematic-contact__clock-value--previous {
+  animation: contact-clock-leave 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cinematic-contact__clock-status {
+  max-width: 23ch;
+  min-height: 2.2em;
+  margin: 0.65rem 0 0;
+  color: var(--color-text-secondary, #383834);
+  font-size: clamp(0.72rem, 0.85vw, 0.9rem);
+  line-height: 1.15;
+}
+
+.cinematic-contact__footer-copyright {
+  grid-column: 4;
+  align-self: end;
+  justify-self: end;
+  max-width: 20rem;
+  margin: 1rem 0 0;
+  color: var(--color-text-muted, #696965);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.cinematic-contact__footer-word {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: -0.06em;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 43vh;
+  overflow: hidden;
+  color: var(--color-text, #0b0b0b);
+  font-family: var(--font-editorial);
+  font-size: clamp(9rem, 29vw, 35rem);
+  font-weight: 500;
+  line-height: 0.68;
+  letter-spacing: -0.085em;
+  white-space: nowrap;
+}
+
+.cinematic-contact__footer-letter {
+  display: inline-block;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.cinematic-contact__footer-word-zones {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.cinematic-contact__footer-word-hit {
+  display: block;
+  cursor: default;
+}
+
+@keyframes contact-clock-enter {
+  from { opacity: 0.35; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes contact-clock-leave {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0.2; transform: translateY(-100%); }
+}
+
+@media (max-width: 1023px) {
+  .cinematic-contact {
+    min-height: auto;
+    padding: 7rem 1rem 8rem;
+    background: #020108;
+  }
+
+  .cinematic-contact__surface {
+    display: none;
+  }
+
+  .cinematic-contact__backdrop {
+    display: none;
+  }
+
+  .cinematic-contact__footer {
+    min-height: 100svh;
+    transform: none;
+  }
+
+  .cinematic-contact__footer-content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 72svh;
+    padding: 4rem 1rem 2rem;
+  }
+
+  .cinematic-contact__footer-intro {
+    grid-column: 1 / -1;
+  }
+
+  .cinematic-contact__footer-clocks {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cinematic-contact__footer-copyright {
+    grid-column: 1 / -1;
+    justify-self: start;
+    text-align: left;
+  }
+
+  .cinematic-contact__footer-word {
+    height: 28svh;
+    font-size: 30vw;
+  }
+
+  .cinematic-contact__stage {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+    color: #f5f5f2;
+    transform: none;
+  }
+
+  .cinematic-contact__title {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-bottom: 4rem;
+    font-size: clamp(4rem, 17vw, 7rem);
+    white-space: normal;
+    color: #f5f5f2;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .cinematic-contact__frame {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(76vw, 24rem);
+    margin: 0 0 3rem auto;
+  }
+
+  .cinematic-contact__frame--second {
+    margin: 1rem auto 3rem 0;
+  }
+
+  .cinematic-contact__copy {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(78%, 20rem);
+    margin: 0 0 3rem auto;
+    text-align: left;
+  }
+
+  .cinematic-contact__copy--second {
+    margin: 0 auto 3rem 0;
+  }
+
+  .cinematic-contact__bottom {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    margin-top: 2rem;
+  }
+
+  .cinematic-contact__socials,
+  .cinematic-contact__mail {
+    clip-path: none;
+  }
+
+  .cinematic-contact__bottom {
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-contact {
+    background: #020108;
+  }
+
+  .cinematic-contact__backdrop,
+  .cinematic-contact__surface {
+    display: none;
+  }
+
+  .cinematic-contact__footer {
+    transform: none !important;
+  }
+
+  .cinematic-contact__stage {
+    transform: none !important;
+  }
+
+  .cinematic-contact__surface,
+  .cinematic-contact__title,
+  .cinematic-contact__frame,
+  .cinematic-contact__placeholder,
+  .cinematic-contact__copy,
+  .cinematic-contact__socials,
+  .cinematic-contact__mail {
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  .cinematic-contact__title {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .cinematic-contact__bottom {
+    opacity: 1 !important;
+    clip-path: none !important;
+  }
+
+  .cinematic-contact__footer-content,
+  .cinematic-contact__footer-scene,
+  .cinematic-contact__footer-letter,
+  .cinematic-contact__clock-value {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .cinematic-contact__footer {
+    min-height: 125svh;
+    margin-bottom: -7rem;
+  }
+
+  .cinematic-contact__footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    min-height: 102svh;
+    padding-top: 3.5rem;
+  }
+
+  .cinematic-contact__footer-intro h2 {
+    font-size: clamp(3rem, 14vw, 4.5rem);
+  }
+
+  .cinematic-contact__footer-clocks {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .cinematic-contact__footer-copyright {
+    grid-column: auto;
+    margin-top: auto;
+  }
+
+  .cinematic-contact__footer-word {
+    height: 23svh;
+    font-size: 31vw;
+  }
+}

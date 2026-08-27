@@ -1,0 +1,197 @@
+@font-face {
+  font-family: "Cassandra";
+  src: url("./assets/CassandraPersonalUseRegular.ttf") format("truetype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.signature-marquee {
+  position: relative;
+  z-index: 10;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  background: var(--color-bg);
+  color: #0b0b0b;
+}
+
+.signature-marquee__filter-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.signature-marquee__stage {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  column-gap: 0.625rem;
+  align-items: center;
+  min-height: clamp(34rem, 59.7vw, 47.8rem);
+  padding: clamp(4rem, 4.86vw, 4.375rem) 0.625rem clamp(5rem, 6.95vw, 6.25rem);
+  box-sizing: border-box;
+}
+
+.signature-marquee__rows {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  color: #0b0b0b;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: clamp(7rem, 14vw, 12.5rem);
+  font-weight: 100;
+  opacity: 1;
+  letter-spacing: -0.07em;
+  line-height: 1;
+  list-style: none;
+  filter: url(#signature-marquee-thin);
+}
+
+.signature-marquee__rows li {
+  display: flex;
+  flex: none;
+  width: max-content;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.signature-marquee__rows li > span {
+  display: block;
+  flex: none;
+  padding-right: 0.08em;
+}
+
+.signature-marquee__card {
+  position: relative;
+  z-index: 2;
+  grid-column: 10 / span 6;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  aspect-ratio: 0.827;
+  min-width: 0;
+  padding: clamp(2rem, 3.47vw, 3.125rem) clamp(1.75rem, 3.47vw, 3.125rem);
+  box-sizing: border-box;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #f4e33f;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #0b0b0b;
+  text-align: center;
+  transform: translateZ(0);
+}
+
+.signature-marquee__card::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: transparent;
+  content: "";
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+
+.signature-marquee__quote {
+  max-width: 10ch;
+  margin: 0;
+  color: #0b0b0b;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: clamp(1.45rem, 2.22vw, 2rem);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+}
+
+.signature-marquee__signature-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.65rem, 1.15vw, 1rem);
+  margin-top: auto;
+  transform: rotate(-7deg);
+  transform-origin: center;
+}
+
+.signature-marquee__signature {
+  display: block;
+  width: clamp(13rem, 20vw, 18rem);
+  height: auto;
+  max-width: 100%;
+  margin: 0;
+  filter: brightness(0);
+}
+
+.signature-marquee__name {
+  margin: 0;
+  color: #0b0b0b;
+  font-family: "Cassandra", "Brush Script MT", cursive;
+  font-size: clamp(1.3rem, 2.5vw, 2.15rem);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 0.78;
+  white-space: nowrap;
+  filter: url(#signature-cassandra-thin);
+}
+
+@media (max-width: 1023px) {
+  .signature-marquee__stage {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    min-height: clamp(32rem, 75vw, 45rem);
+  }
+
+  .signature-marquee__rows {
+    font-size: clamp(6rem, 18vw, 9.375rem);
+  }
+
+  .signature-marquee__card {
+    grid-column: 4 / span 6;
+  }
+}
+
+@media (max-width: 767px) {
+  .signature-marquee__stage {
+    min-height: 34rem;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+  }
+
+  .signature-marquee__rows {
+    font-size: clamp(5rem, 22vw, 7rem);
+    letter-spacing: -0.08em;
+  }
+
+  .signature-marquee__card {
+    grid-column: 3 / span 8;
+    aspect-ratio: 0.86;
+    padding: 3rem 1.875rem;
+  }
+
+  .signature-marquee__quote {
+    font-size: clamp(1.35rem, 5.5vw, 1.75rem);
+  }
+
+  .signature-marquee__signature {
+    width: clamp(10rem, 40vw, 15rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signature-marquee__rows li,
+  .signature-marquee__card {
+    transform: none !important;
+  }
+}

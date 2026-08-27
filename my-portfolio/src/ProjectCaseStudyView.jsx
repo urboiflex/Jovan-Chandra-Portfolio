@@ -1,11 +1,11 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import {
   clampHandoffProgress,
   createHandoffNavigator,
   getCaseHeroParallaxMotion,
   getCaseMilestoneTrigger,
-  getHandoffTriggerStart,
+  getHandoffScrollTriggerConfig,
   getHandoffLabels,
   getMilestoneProgressMotion,
   shouldCompleteHandoff,
@@ -23,23 +23,32 @@ export default function ProjectCaseStudyView({
   onNext,
   isLoaded = true,
 }) {
+  const projectLink = project.visitUrl || project.githubUrl;
+  const projectLinkLabel = project.visitUrl ? 'Live site' : 'GitHub';
   const rootRef = useRef(null);
   const handoffLockedRef = useRef(false);
+  const handoffDirectionRef = useRef(1);
   const handoffDestinationRef = useRef({ nextProject, onNext, onBack });
   const handoffNavigatorRef = useRef(null);
   const [activeScreen, setActiveScreen] = useState(0);
   const gallery = project.gallery?.length ? project.gallery : [project.img];
   const handoffLabels = getHandoffLabels(currentProjectIndex, projectCount);
   const handoffTitle = nextProject ? nextProject.title : 'Works';
-  handoffDestinationRef.current = { nextProject, onNext, onBack };
 
-  if (!handoffNavigatorRef.current) {
+  useLayoutEffect(() => {
+    handoffDestinationRef.current = { nextProject, onNext, onBack };
+  }, [nextProject, onBack, onNext]);
+
+  useLayoutEffect(() => {
     handoffNavigatorRef.current = createHandoffNavigator({
       destinationRef: handoffDestinationRef,
       lockRef: handoffLockedRef,
+      schedule: (callback) => window.requestAnimationFrame(callback),
     });
-  }
-  const navigateToDestination = handoffNavigatorRef.current;
+    return () => { handoffNavigatorRef.current = null; };
+  }, []);
+
+  const navigateToDestination = useCallback(() => handoffNavigatorRef.current?.(), []);
 
   useLayoutEffect(() => {
     handoffLockedRef.current = false;
@@ -130,45 +139,42 @@ export default function ProjectCaseStudyView({
         const handoffPanel = handoff.querySelector('.case-study__handoff-panel');
         const handoffFill = handoff.querySelector('[data-handoff-progress]');
         const handoffInvert = handoff.querySelector('[data-handoff-invert]');
-        const handoffContents = handoff.querySelectorAll('[data-handoff-content]');
-        const handoffArrows = handoff.querySelectorAll('[data-handoff-arrow]');
 
         const handoffTimeline = gsap.timeline({
           scrollTrigger: {
             trigger: handoff,
-            start: () => getHandoffTriggerStart(handoffPanel?.offsetHeight),
-            end: 'bottom bottom',
-            scrub: 0.65,
-            onUpdate: (self) => {
-              const progressValue = clampHandoffProgress(self.progress);
-              if (shouldCompleteHandoff({
-                progress: progressValue,
-                direction: self.direction,
-                isLocked: handoffLockedRef.current,
-                reducedMotion,
-              })) {
-                navigateToDestination();
-              }
-            },
+            ...getHandoffScrollTriggerConfig({
+              bannerHeight: handoffPanel?.offsetHeight,
+              pin: rootRef.current,
+              onUpdate: (self) => {
+                handoffDirectionRef.current = self.direction;
+              },
+              onScrubComplete: (self) => {
+                const progressValue = clampHandoffProgress(self.progress);
+                if (shouldCompleteHandoff({
+                  progress: progressValue,
+                  direction: handoffDirectionRef.current,
+                  isLocked: handoffLockedRef.current,
+                  reducedMotion,
+                })) {
+                  navigateToDestination();
+                }
+              },
+            }),
           },
         });
 
         handoffTimeline
-          .fromTo(handoffFill, { scaleX: 0 }, { scaleX: 1, ease: 'none' }, 0)
+          .to({}, { duration: 0.12 })
+          .fromTo(handoffFill, { scaleX: 0 }, { scaleX: 1, duration: 0.88, ease: 'none' }, 0.12)
           .fromTo(handoffInvert,
             { clipPath: 'inset(0 100% 0 0)' },
-            { clipPath: 'inset(0 0% 0 0)', ease: 'none' }, 0)
-          .fromTo(handoffContents,
-            { x: 0 },
-            { x: 20, ease: 'power2.inOut' }, 0)
-          .fromTo(handoffArrows,
-            { x: 0, y: 0 },
-            { x: 8, y: -8, ease: 'power2.inOut' }, 0);
+            { clipPath: 'inset(0 0% 0 0)', duration: 0.88, ease: 'none' }, 0.12);
       }
     }, rootRef);
 
     return () => context.revert();
-  }, [project.id, gallery.length, isLoaded]);
+  }, [project.id, gallery.length, isLoaded, navigateToDestination]);
 
   const scrollToScreen = (index) => {
     const target = rootRef.current?.querySelector(`[data-case-study-screen="${index + 1}"]`);
@@ -199,7 +205,10 @@ export default function ProjectCaseStudyView({
           <div><dt>Role</dt><dd>{project.roles}</dd></div>
           <div><dt>Timeline</dt><dd>{project.duration}</dd></div>
           <div><dt>Technology</dt><dd>{project.tools.join(', ')}</dd></div>
-          <div><dt>Source</dt><dd><a href={project.githubUrl} target="_blank" rel="noopener noreferrer">GitHub ↗</a></dd></div>
+          <div>
+            <dt>{project.visitUrl ? 'Visit' : 'Source'}</dt>
+            <dd><a href={projectLink} target="_blank" rel="noopener noreferrer">{projectLinkLabel} ↗</a></dd>
+          </div>
         </dl>
       </section>
 

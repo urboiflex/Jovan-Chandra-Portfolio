@@ -20,6 +20,18 @@ export const getHandoffTriggerStart = (bannerHeight) => {
   return height > 0 ? `top bottom-=${height}` : 'top bottom';
 };
 
+export const getHandoffScrollTriggerConfig = ({ bannerHeight, pin, onUpdate, onScrubComplete }) => ({
+  start: getHandoffTriggerStart(bannerHeight),
+  end: 'bottom bottom',
+  scrub: 1.05,
+  pin,
+  pinSpacing: false,
+  pinType: 'fixed',
+  anticipatePin: 0,
+  onUpdate,
+  onScrubComplete,
+});
+
 export const clampHandoffProgress = (value) => {
   if (!Number.isFinite(value)) return 0;
   return Math.min(1, Math.max(0, value));
@@ -60,15 +72,21 @@ export const shouldCompleteHandoff = ({
   && clampHandoffProgress(progress) >= CASE_STUDY_HANDOFF_THRESHOLD
 );
 
-export const createHandoffNavigator = ({ destinationRef, lockRef }) => () => {
+export const createHandoffNavigator = ({
+  destinationRef,
+  lockRef,
+  schedule = (callback) => callback(),
+}) => () => {
   if (lockRef.current) return false;
   lockRef.current = true;
-  const { nextProject, onNext, onBack } = destinationRef.current;
-  if (nextProject) {
-    onNext(nextProject.id);
-  } else {
-    onBack();
-  }
+  schedule(() => {
+    const { nextProject, onNext, onBack } = destinationRef.current;
+    if (nextProject) {
+      onNext(nextProject.id);
+    } else {
+      onBack();
+    }
+  });
   return true;
 };
 
@@ -76,6 +94,7 @@ export const restoreCaseStudyScroll = (
   controller,
   fallbackScroll,
   schedule = requestAnimationFrame,
+  { resume = true } = {},
 ) => {
   schedule(() => {
     if (!controller) {
@@ -84,6 +103,6 @@ export const restoreCaseStudyScroll = (
     }
 
     controller.scrollTo(0, { immediate: true, force: true });
-    controller.start();
+    if (resume) controller.start();
   });
 };

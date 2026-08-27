@@ -30,7 +30,7 @@ test('renders an accessible synchronized archive with an abstract thumbnail rail
         desc: 'Kicks & Co. is a premium sneaker storefront. Designed for focused browsing.',
         img: '/kicks.png',
         roles: 'Development',
-        tools: ['GSAP', 'C#'],
+        tools: ['T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09', 'T10', 'T11', 'T12'],
       },
     ];
     const markup = renderToStaticMarkup(React.createElement(WorksArchiveView, {
@@ -42,7 +42,8 @@ test('renders an accessible synchronized archive with an abstract thumbnail rail
     assert.match(markup, /<h1[^>]*>Works<\/h1>/);
     assert.doesNotMatch(markup, /<section[^>]*data-detail-main/);
     assert.match(markup, /<div[^>]*class="works-archive__content"[^>]*data-detail-main/);
-    assert.match(markup, /aria-label="Back"/);
+    assert.match(markup, /class="works-archive__back project-link group"[^>]*aria-label="Back"/);
+    assert.equal((markup.match(/aria-label="Back"/g) ?? []).length, 2);
     assert.match(markup, /aria-label="Open Vouch Dashboard"/);
     assert.equal((markup.match(/data-works-thumbnail=/g) ?? []).length, 2);
     assert.equal((markup.match(/data-works-panel=/g) ?? []).length, 2);
@@ -50,6 +51,8 @@ test('renders an accessible synchronized archive with an abstract thumbnail rail
     assert.match(markup, /Kicks &amp; Co\. is a premium sneaker storefront\./);
     assert.doesNotMatch(markup, /Designed for focused browsing/);
     assert.match(markup, /JavaScript · R/);
+    assert.match(markup, /T01 · T02 · T03 · T04 · T05 · T06 · T07 · T08 · T09 · T10 · and more…/);
+    assert.doesNotMatch(markup, /T11|T12/);
     assert.doesNotMatch(markup, />\+<\/span>/);
     assert.equal((markup.match(/data-project-arrow=/g) ?? []).length, 2);
     const hiddenCursorTargets = markup.match(/<button[^>]*data-hide-project-cursor[^>]*>/g) ?? [];

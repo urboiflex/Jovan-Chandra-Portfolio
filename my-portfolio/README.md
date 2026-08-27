@@ -1,5 +1,16 @@
 # React + TypeScript + Vite
 
+## Automatic Netlify deployment
+
+Every push to the `main` branch is built and deployed to the production Netlify site by the GitHub Actions workflow in `.github/workflows/deploy-netlify.yml`.
+
+Before the first run, add these repository secrets in GitHub under **Settings > Secrets and variables > Actions**:
+
+- `NETLIFY_AUTH_TOKEN`: create a personal access token in Netlify under **User settings > Applications > Personal access tokens**.
+- `NETLIFY_SITE_ID`: copy the **Project ID** from the Netlify project's **Project configuration > General** page.
+
+The workflow can also be started manually from the repository's **Actions** tab.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
